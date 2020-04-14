@@ -1,0 +1,52 @@
+#deviceready {
+    #dialog {
+        font-weight: bold;
+        .container.common {
+            text-align: center;
+            .main {
+                position: relative;
+                width: 711px;
+                height: 449px;
+                background: url('../images/dialog/bg.png') center no-repeat;
+                .wrapper {
+                    position: relative;
+                    &>span {
+                        display: block;
+                    }
+                    .title {
+                        font-size: 32px;
+                        color: #c85504;
+                    }
+                    .icon {
+                        width: 196px;
+                        height: 196px;
+                        margin: 23px auto 25px;
+                    }
+                    .tip {
+                        font-size: 20px;
+                        color: #d8692b;
+                    }
+                }
+    
+            }   
+            .btn {
+                display: inline-block;
+                width: 220px;
+                height: 90px;
+                line-height: 90px;
+                margin-top: 30px;
+                font-size: 32px;
+                color: #fff;
+                background: url('../images/dialog/btn.png') no-repeat center;
+                border: none;
+            }
+            .btn.btn-focus {
+                background: url('../images/dialog/btnfocus.png') no-repeat center,
+                url('../images/dialog/btn.png') no-repeat center;
+            }     
+        }
+    }
+}
+
+
+

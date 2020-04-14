@@ -1,0 +1,228 @@
+$bgAwardColor: green;
+
+#deviceready {
+    #awardPage {
+        background: url('../images/award/bg.jpg') no-repeat top;
+        .scroll-wrapper {
+            height: 600px;
+        }
+        .header {
+            width: 494px;
+            height: 90px;
+            margin: 14px auto 66px;
+            font-size: 0;
+            position: relative;
+            &>div {
+                position: relative;
+                display: inline-block;
+                width: 247px;
+                height: 100%;
+                border: none;
+                border-radius: unset;
+                img {
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                }
+                &.btn-focus>img {
+                    display: block;
+                }
+            }
+            &>div:nth-child(odd) {
+                background: url('../images/award/titleiconl.png')  center/100% no-repeat;
+            }
+            &>div:nth-child(odd).highlight {
+                background: url('../images/award/titleiconlf.png')  center/100% no-repeat;
+            }
+            &>div:nth-child(even) {
+                position: relative;
+                left: -1px;
+                background: url('../images/award/titleiconr.png')  center/100% no-repeat;
+            }
+            &>div:nth-child(even).highlight {
+                background: url('../images/award/titleiconrf.png')  center/100% no-repeat;
+            }
+            &>div:nth-child(3),&>div:nth-child(4){
+                display: none;
+            }
+            &>div:nth-child(odd).btn-focus {
+                img {
+                    left: 0;
+                    right: -8px;    
+                }
+            }
+            &>div:nth-child(even).btn-focus {
+                img {
+                    left: -7px;
+                    right: 0;    
+                }
+            }
+        }
+        .content {
+            margin: 32px 41px 0 61px;
+            position: relative;
+            ul,li {
+                display: inline-block;
+            }
+            .sidebar {
+                position: relative;
+                width: 61px;
+                height: 167px;
+                background: url('../images/award/icontitle.png') center/contain no-repeat;
+                div {
+                    position: absolute;
+                    font-size: 22px;
+                    text-align: center;
+                    color: #b16436;    
+                }
+                padding: 20px;
+                box-sizing: border-box;
+                float: left;
+                margin: 3px 17px 0 0;
+            }
+            .list-wrapper {
+                font-size: 0;
+                width: 1095px;
+                right: 0;
+                top: 0;
+                // &>.btn-focus {
+                //     // border-radius: unset;
+                //     filter: drop-shadow(0 0 2px rgba(21,255,230,0.7));
+                //     -webkit-filter: drop-shadow(0 0 2px rgba(21,255,230,0.7));
+                // }
+                &>li {
+                    width: 330px;
+                    height: 173px;
+                    margin: 0 27px 32px 0;
+                    position: relative;
+                    background: url('../images/award/iconcard.png') center/100% no-repeat;
+                    &>* {
+                        position: absolute;
+                        text-align: center;
+                    }
+                    img {
+                        display: block;
+                        top: 25px;
+                        left: 27px;
+                        width: 125px;
+                        height: 125px;
+                    }
+                    .title {
+                        top: 37px;
+                        right: 20px;
+                        width: 157px;
+                        font-size: 18px;
+                        color: #b16436;
+                        line-height: 22px;
+                    }
+                    .btn {
+                        width: 108px;
+                        height: 37px;
+                        bottom: 27px;
+                        right: 46px;
+                        background: url('../images/award/btncollect.png') no-repeat center/100%;
+                    }
+                    .btn.gouse {
+                        background: url('../images/award/btnuse.png') no-repeat center/100%;
+                    }
+                    .btn.collected {
+                        background: url('../images/award/btncollected.png') no-repeat center/100%;
+                    }
+                    .btn.used {
+                        background: url('../images/award/btnused.png') no-repeat center/100%;
+                    }
+                    .btn.timeout {
+                        background: url('../images/award/btntimeout.png') no-repeat center/100%;
+                    }
+                }
+                &>li.wxredbag {
+                    background: url('../images/award/iconredpacket.png') center/100% no-repeat;
+                    img {
+                        display: none;
+                    }
+                    .title {
+                        top: 48px;
+                        left: 108px;
+                        width: 83px;
+                        height: 32px;
+                        font-size: 36px;
+                        color: #FFFF8F;
+                        line-height: 32px;
+                    }
+                    .btn {
+                        bottom: 29px;
+                        left: 111px;
+                    }
+                }
+                &>li.wxredbag.collected {
+                    background: url('../images/award/iconredpacketopend.png') center/100% no-repeat;
+                    .title {
+                        color: #f03b32;
+                    }
+                }
+
+            }
+
+        }
+        .content:last-of-type {
+            padding-bottom: 100px;
+        }
+        .privilege {
+            position: relative;
+            margin: 0 auto;
+            padding-bottom: 100px;
+            width: 1072px;
+            li.btn-focus {
+                box-shadow: 2px 2px 2px #d5ffed;
+                filter: drop-shadow(0 0 2px rgba(21,255,230,0.7));
+                -webkit-filter: drop-shadow(0 0 2px rgba(21,255,230,0.7));
+            }
+            li {
+                position: relative;
+                width: 100%;
+                height: 216px;
+                margin-bottom: 13px;
+                background: url('../images/award/iconprivilege.png') center/contain no-repeat;
+                border-radius: 18px;
+                &>* {
+                    position: absolute;
+                }
+                img {
+                    top: 32px;
+                    left: 49px;
+                    width: 151px;
+                    height: 151px;
+                }
+                .text {
+                    color: #c85504;
+                    left: 250px;
+                }
+                .title {
+                    font-size: 36px;
+                    top: 60px;
+                }
+                .tips{
+                    top: 120px;
+                    font-size: 20px;
+                }
+                .btn {
+                    width: 198px;
+                    height: 72px;
+                    right: 36px;
+                    top: 75px;
+                    background: url('../images/award/btncollect.png') center/contain no-repeat;
+                }
+                .btn.collected {
+                    background: url('../images/award/btncollected.png') no-repeat center/100%;
+                }
+            }
+
+        }
+
+    }
+
+}
+
+
+

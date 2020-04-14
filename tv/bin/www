@@ -1,0 +1,42 @@
+
+const browserSync = require('browser-sync').create();
+const config = require('../config');
+
+let options = process.argv.slice(2)
+let desObj = Object.assign({
+    server: config.dev.localDistDir || './dist', //这里指的是根目录，如果index.html在根目录下，会直接打开index页面，不然会显示Get Not
+    port: config.dev.localPort || 8081, 
+}, (options[0] === '-w' ? {files: '**/*.html, **/*.css, **/*.js'} : {}))
+browserSync.init(desObj);
+
+// const express = require('express');
+// const config = require('../config');
+// const path = require('path');
+// const fs = require("fs");
+// const chokidar = require('chokidar');
+
+// let app = express();
+// let srcStaticDir = path.resolve('src');
+// let distStaticDir = config.dev.localDistDir;
+// console.log("源文件目录:", srcStaticDir);
+// console.log("dist目录: ", distStaticDir);
+// if (fs.existsSync(distStaticDir)) {
+//     app.use(express.static(distStaticDir));
+// } else {
+//     app.use(express.static(srcStaticDir));
+// }
+// fs.watch(distStaticDir, function(event, filename) {
+//     console.log('event:', event)
+//     console.log('filename:', filename)
+// })
+// const watch = chokidar.watch(distStaticDir, {
+//     ignored: /[\/\\]\./, 
+//     persistent: true
+// })
+// watch.on('change', function(path) {
+//     console.log('changed ' + path);
+//     process.exit();
+// })
+// let PORT = config.dev.localPort || 3006;
+// app.listen(PORT);
+// console.log('Please visit the website: http://localhost:' + PORT);

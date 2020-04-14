@@ -1,0 +1,186 @@
+'use strict'
+
+const fs = require("fs");
+const ftpClient = require('ftp');
+const path = require('path');
+const chalk = require('chalk')
+const config = require('../config');
+
+let c = ftpClient();
+
+if (fs.existsSync(config.dev.localDistDir)) {
+    c.on('ready', function (err) {
+        if (err) console.log(chalk.red('  Error: ' + err + '\n'))
+        console.log(chalk.yellow('  Ready to upload...\n'))
+        uploadFile(config.dev.localDistDir, config.dev.serverDir, function () {
+            console.log(chalk.yellow('\n  Congratulations, upload success！！！！'))
+            let url = "http://" + path.join(config.dev.serverDomain, config.dev.serverDir, config.dev.entry);
+            console.log(chalk.yellow('\n  Please visit the website: ' + url + '\n'))
+            console.log(chalk.yellow('  If you wanna debug on TV, you can use this commond: '))
+            // console.log(chalk.yellow('  am start -a coocaa.intent.action.browser --es "url" "' + url + '" \n'))
+            console.log(chalk.yellow('  logcat -c; am start -a coocaa.intent.action.browser --es "url" "' + url + '" ; logcat -s chromium WebViewSDK \n'))
+            c.end();
+        }).catch(function(err) {
+            console.log(chalk.red('  Catch ' + err + '\n'))
+            c.end();
+        });
+    });
+    c.on('error', function (err) {
+        console.log(chalk.red('  Error: ' + err + '\n'))
+    })
+    c.connect(config.dev.ftpConnection);
+} else {
+    console.log(chalk.red('  Error: ' + config.dev.localDistDir + "  Not Found!"))
+}
+
+async function uploadFile(srcDirPath, desDirPath, callback) {
+    try {
+        await createRemoteDir(desDirPath)
+    } catch (err) {
+        console.log(chalk.red('  Throw ' + err + '\n'))
+        throw err;
+    }
+    console.log(chalk.green('  Create dir :' + desDirPath));
+    let files = fs.readdirSync(srcDirPath);
+    for (let filename of files) {
+        let file = path.join(srcDirPath, filename);
+        let fileState = fs.statSync(file);
+        let isFile = fileState.isFile();
+        let isDir = fileState.isDirectory();
+        if (isFile) {
+            // console.log(chalk.cyan('  srcFilePath:' + srcDirPath));
+            // console.log(chalk.cyan('  desFilePath:' + path.join(desDirPath, filename)));
+            console.log(chalk.cyan('  ' + file + ' -> ' + path.join(desDirPath, filename) + ' await upload'));
+            try {
+                await uploadFileToFtp(file, path.join(desDirPath, filename))
+            } catch (err) {
+                console.log(chalk.red('  Throw ' + err + '\n'))
+                throw err;
+            }
+            console.log(chalk.cyan('  ' + file + ' -> ' + path.join(desDirPath, filename) + ' upload success'));
+        }
+        if (isDir) {
+            // console.log(chalk.cyan('  srcDirPath:' + file));
+            // console.log(chalk.cyan('  desDirPath:' + filename));
+            try {
+                await uploadFile(file, path.join(desDirPath, filename))
+            } catch (err) {
+                console.log(chalk.red('  Throw ' + err + '\n'))
+                throw err;
+            }
+        }
+    }
+    callback && callback.call();
+}
+
+function createRemoteDir(desDirPath) {
+    let _desDirPath = desDirPath.replace(/\\/g,"/"); //处理windows和linux斜杠的兼容性
+    return new Promise((resolve, reject) => {
+        c.mkdir(_desDirPath, false, (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+}
+
+function uploadFileToFtp(srcFile, desFile) {
+    let _desFile = desFile.replace(/\\/g,"/"); //处理windows和linux斜杠的兼容性
+    return new Promise((resolve, reject) => {
+        c.put(srcFile, _desFile, (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+}
+
+// function uploadFile(srcDirPath, desDirPath) {
+//     c.mkdir(desDirPath, false, function (err) {
+//         if (err) return console.log(chalk.red('  Error: ' + err + '\n'));
+//         console.log(chalk.green('  Create dir :' + desDirPath));
+//         let files = fs.readdirSync(srcDirPath);
+//         console.log(files.length);
+//         files.forEach(function (filename) {
+//             let file = path.join(srcDirPath, filename);
+//             let fileState = fs.statSync(file);
+//             let isFile = fileState.isFile();
+//             let isDir = fileState.isDirectory();
+//             if (isFile) {
+//                 console.log(chalk.cyan('  srcFilePath:' + srcDirPath));
+//                 console.log(chalk.cyan('  desFilePath:' + path.join(desDirPath, filename)));
+//                 c.put(file, path.join(desDirPath, filename), function (err) {
+//                     if (err) {
+//                         return console.log(chalk.red('  Error: ' + err + '\n'))  
+//                     }
+//                     console.log(chalk.yellow('  ' + file + ' -> ' + path.join(desDirPath, filename) + ' upload success'));
+//                 });
+//             }
+//             if (isDir) {
+//                 console.log(chalk.cyan('  srcDirPath:' + file));
+//                 console.log(chalk.cyan('  desDirPath:' + filename));
+//                 return uploadFile(file, path.join(desDirPath, filename));
+//             }
+//         })
+//     })
+// }
+
+// function uploadFile(filePath, desDirPath) { 
+//     c.mkdir(desDirPath, false, function (err) {
+//         if (err) return console.log(chalk.red('  Error: ' + err + '\n'))  
+//         console.log(chalk.green('  Create dir :' + desDirPath))
+//         fs.readdir(filePath, function (err, files) {
+//             if (err) {
+//                 return console.log(chalk.red('  Error: ' + err + '\n'))  
+//             } else {
+//                 console.log(files.length)
+//                 files.forEach(function (filename) {
+//                     let filedir = path.join(filePath, filename);
+//                     fs.stat(filedir, function (err, stats) {
+//                         if (err) {
+//                             return console.log(chalk.red('  Error: ' + err + '\n'))
+//                         } else {
+//                             let isFile = stats.isFile();
+//                             let isDir = stats.isDirectory();
+//                             if (isFile) {
+//                                 console.log(chalk.cyan('  srcFilePath:' + filedir));
+//                                 console.log(chalk.cyan('  desFilePath:' + path.join(desDirPath, filename)));
+//                                 c.put(filedir, path.join(desDirPath, filename), function (err) {
+//                                     if (err) {
+//                                         return console.log(chalk.red('  Error: ' + err + '\n'))  
+//                                     }
+//                                     console.log(chalk.yellow('  ' + filedir + ' -> ' + path.join(desDirPath, filename) + ' upload success'));
+//                                 });
+//                             }
+//                             if (isDir) {
+//                                 console.log(chalk.cyan('  srcDirPath:' + filedir));
+//                                 console.log(chalk.cyan('  desDirPath:' + filename));
+//                                 return uploadFile(filedir, path.join(desDirPath,filename));
+//                             }
+//                         }
+//                     })
+//                 })
+//             }
+//         });
+//     })
+// }
+
+// console.log(desDirPath)
+// c.list(function(err, list){
+//     if (err) {
+//         console.log(err);
+//     }
+//     console.dir(list)
+// })
+// c.get('fyb/zzz/11.txt', function(err){
+//     if(err) {
+//         console.log(err)
+//     }else{
+//         console.log('ok')
+//     }   
+// })
+// c.mkdir('fyb/zzz/zzz', false, function (err) {
+//     if(err) {
+//         console.log(err)
+//     }else{
+//         console.log('ok')
+//     }   
+// })
