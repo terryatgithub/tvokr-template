@@ -5,20 +5,19 @@ import ccEvent from '../handler/index.js';
  * 对话框类（模态弹窗） 
  */
 class Dialog {
-	/**
-	 * 获取对话框实例，默认为单例模式
-	 */
-	static getInstance() {
-		if(!this.inst) {
-			this.inst = new Dialog()
-		}
-		return this.inst
-	}
+	// /**
+	//  * 获取对话框实例，默认为单例模式
+	//  */
+	// static getInstance(selector) {
+	// 	if(!this.inst) {
+	// 		this.inst = new Dialog(selector)
+	// 	}
+	// 	return this.inst
+	// }
 
-	constructor() {
-		this.inst = null 
-		this.id = '#dialog .common' //选择器
-		this._param = null	//实例化参数
+	constructor(selector) {
+		this.id = selector //选择器
+		this._param = null //实例化参数
 	}
 
 	/**
@@ -105,7 +104,7 @@ class Dialog {
 
 	/**
 	 * 显示UI，仅限内部使用
-	 * @param {*} param 
+	 * @param {Object} param 
 	 */
 	_show(param) {
 		this._param = param
@@ -134,6 +133,6 @@ class Dialog {
 	
 }
 
-const dialog = Dialog.getInstance()
-
+export {Dialog}
+const dialog = new Dialog('#dialog .common')
 export default dialog
