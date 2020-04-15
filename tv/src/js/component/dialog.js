@@ -2,86 +2,70 @@ import '../../css/dialog.scss'
 import ccEvent from '../handler/index.js';
 
 /**
- * 确认弹窗
- * sample 用法如下
+ * 对话框类（模态弹窗） 
  */
-// ccDialog.show({
-// 	title: '恭喜您成功瓜分10天VIP权益',
-// 	icon: './images/dialog/iconframe.png',
-// 	tip: '奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
-// 	btnOK: '立即领取',
-// 	btnCancel: '取消',
-// 	onOK: function() { 
-// 		console.log('ok') 
-// 	},
-// 	onCancel: function() {
-// 		console.log('cancel')
-// 	},
-// 	onComplete: function() {
-// 		console.log('complete')
-// 	}
-// })
-var dialog = {
-	id: '#dialog .common',
-	_param: null,
-	_render() {
-		let param = this._param
-		let dlg = $(this.id).children()
-		dlg.find('.title').html(param.title || '提示')
-		dlg.find('.icon').attr('src', param.icon)
-		dlg.find('.tip').html(param.tip || '')
-		dlg.filter('.dialog-confirm').text(param.btnOK || '确认')
-		param.btnCancel && dlg.filter('.dialog-cancel').text(param.btnCancel || '取消').show().addClass('coocaa_btn')
-	},
-	eventHandler(e) {
-		let ctx = e.data.ctx
-		if ($(this).hasClass('dialog-confirm')) {
-			ctx._param.onOK && ctx._param.onOK()
-			ctx._param.onComplete && ctx._param.onComplete()
-			ctx.hide(false)
-			ctx._param.success()
-		} else {
-			ctx.hide()
-		}		
-    },
-	_show(param) {
-		this._param = param
-		this._render()
-		$('#dialog').show()
-		let btns = $(`${this.id} .coocaa_btn`),
-			defFocus = param.defFocus == 'cancel' ? '.dialog-cancel' : '.dialog-confirm'
-		ccMap.init(btns, btns.filter(defFocus), "btn-focus")
-		ccEvent.bindClick(btns, {ctx: this}, this.eventHandler)
-	},
+class Dialog {
+	/**
+	 * 获取对话框实例，默认为单例模式
+	 */
+	static getInstance() {
+		if(!this.inst) {
+			this.inst = new Dialog()
+		}
+		return this.inst
+	}
+
+	constructor() {
+		this.inst = null 
+		this.id = '#dialog .common' //选择器
+		this._param = null	//实例化参数
+	}
+
+	/**
+	 * 显示对话框
+	 * @param {Object} param 对话框需要显示的信息，包括title/tips/button上的提示语
+	 * @returns res.confirm === true 用户按确认键, 否则用户按取消或返回键
+	 */
 	show(param) {
 		let that = this
-		return new Promise((resolve, reject) => {
+		return new Promise(resolve => {
 			that._show({
 				...param,
 				success() {
 					resolve({confirm: true})
 				},
 				fail() {
-					resolve({cancel: true}) //must resolve
+					resolve({cancel: true})
 				}
 			})
 		})
-	},
+	}
+
+	/**
+	 * 隐藏对话框
+	 * @param {Boolean} flag
+	 * 		true: 弹窗响应‘取消’键或‘返回’键，需要执行注册的回调函数; 然后再隐藏弹窗
+	 * 		false: 仅隐藏弹窗
+	 */
 	hide(flag=true) {
 		if(flag) {
-			//弹窗响应返回键时，需要执行跟按’取消‘键一样的流程：
-			//如果有pending Promise, 需要处理,这样才能resolve旧弹窗，并显示后续弹窗
 			this._param.onCancel && this._param.onCancel()
 			this._param.onComplete && this._param.onComplete()
 			this._param.fail()
 		}
+		//默认不显示取消按钮
 		$(this.id).find('.dialog-cancel').hide().removeClass('coocaa_btn')
 		$('#dialog').hide()
-	},
+	}
+	
+	/**
+	 * 查找当前显示的弹窗实例
+	 * @returns {Dialog} 当前显示的弹窗实例
+	 */
 	isShow() {
 		let dlg = null
 		if($('#dialog').css('display') === 'none') return dlg;
-		//找到当前显示的弹窗类型
+		//每个弹窗实例对应的className
 		let dialoglist = {
 			'common': ccDialog,
 			'qrcode': ccQrCode,
@@ -99,8 +83,57 @@ var dialog = {
 			}
 		})
 		return dlg
-	},
+	}
 
+	/**
+	 * 事件处理函数
+	 * this 是触发事件的DOM元素
+	 * e.data.ctx 是注册eventHandler时传递的调用环境上下文(this)
+	 * @param {Event} e 
+	 */
+	eventHandler(e) {
+		let ctx = e.data.ctx
+		if ($(this).hasClass('dialog-confirm')) { //trigger OK button
+			ctx._param.onOK && ctx._param.onOK()
+			ctx._param.onComplete && ctx._param.onComplete()
+			ctx.hide(false)
+			ctx._param.success()
+		} else { //trigger Cancel or Back button
+			ctx.hide()
+		}		
+	}
+
+	/**
+	 * 显示UI，仅限内部使用
+	 * @param {*} param 
+	 */
+	_show(param) {
+		this._param = param
+		//显示UI
+		this._render()
+		$('#dialog').show()
+		//初始化焦点，并注册eventHandler
+		let btns = $(`${this.id} .coocaa_btn`),
+			defFocus = param.defFocus == 'cancel' ? '.dialog-cancel' : '.dialog-confirm'
+		ccMap.init(btns, btns.filter(defFocus), "btn-focus")
+		ccEvent.bindClick(btns, {ctx: this}, this.eventHandler)
+	}
+	/**
+	 * 渲染UI，仅限内部使用
+	 */
+	_render() {
+		let param = this._param
+		let dlg = $(this.id).children()
+		dlg.find('.title').html(param.title || '提示')
+		dlg.find('.icon').attr('src', param.icon)
+		dlg.find('.tip').html(param.tip || '')
+		dlg.filter('.dialog-confirm').text(param.btnOK || '确认')
+		//判断是否需要显示‘取消’按钮
+		param.btnCancel && dlg.filter('.dialog-cancel').text(param.btnCancel || '取消').show().addClass('coocaa_btn')
+	}
+	
 }
+
+const dialog = Dialog.getInstance()
 
 export default dialog

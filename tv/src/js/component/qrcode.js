@@ -5,7 +5,7 @@
 import Dialog from './dialog.js'
 import '../../css/qrcode.scss'
 
- //ES5 实现 使用原型式继承
+//ES5 实现 使用原型式继承
 const QrCodeDialog = Object.create(Dialog)
 QrCodeDialog.id = '#dialog .qrcode'
 QrCodeDialog._render = function() {
@@ -35,11 +35,5 @@ QrCodeDialog.hide = function(flag){
     Dialog.hide.call(this, flag)
     $('#dialog .common').show()
 }
-
-
-//  //ES6实现
-//  class QrCodeDialog extends Dialog{
-
-//  }
 
  export default QrCodeDialog
