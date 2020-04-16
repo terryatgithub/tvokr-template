@@ -2,7 +2,7 @@ import ccView from './view.js'
 import ccEvent from '../handler/index.js'
 import router from '../router/route.js'
 import '../../css/award.scss'
-import {myaward} from '../middleware/middleware.js'
+import mw from '../middleware/middleware.js'
 
 var awardPage = new ccView({
 	name: 'award',
@@ -50,10 +50,10 @@ var awardPage = new ccView({
         ccData.submitLogClick({
             page_name: '奖品点击',
             page_type: 'inactivityWindows',
-            prize_type: myaward.awardsTypeIdObj[curAwardInfo.awardTypeId][1],
+            prize_type: mw.myaward.awardsTypeIdObj[curAwardInfo.awardTypeId][1],
             prize_name: curAwardInfo.awardName
         }) 
-        let res = await myaward.showRewardDialog(curAwardInfo, ctx)
+        let res = await mw.myaward.showRewardDialog(curAwardInfo, ctx)
         if(res) { //res为true时领取完后查询状态变化（实体奖/优惠券/红包..)
           await ctx.refreshPage()
         }
@@ -119,7 +119,7 @@ var awardPage = new ccView({
         this.bindKeys()
     },
     async _getMyReward(bindKey=true) {
-        let res = await myaward.getMyReward()
+        let res = await mw.myaward.getMyReward()
         this._updatePage(res, bindKey)
     },
     _updatePage(res, bindKey=true) { //更新页面奖品信息
@@ -177,7 +177,7 @@ var awardPage = new ccView({
     },
     _updateAwardInfo(value, key) { //更新奖品页面
         let header = `<div class="content"> 
-                        <div class="sidebar"><div class="center">${myaward.getChineseNameByType(key)}</div></div>
+                        <div class="sidebar"><div class="center">${mw.myaward.getChineseNameByType(key)}</div></div>
                         <ul class="list-wrapper">`,
             body = '',
             foot = `    </ul>

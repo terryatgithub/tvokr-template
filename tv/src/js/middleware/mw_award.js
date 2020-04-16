@@ -3,29 +3,53 @@
  * 在后台api基础上，封装页面共同的业务逻辑层
  */
 import _url from '../api/backend/url.js'
+import common from './mw_common'
+import {animate} from '../util/index.js'
 
- const myaward = {
+class DrawLuck {
+     constructor() {
+          this.isDrawingNow = false //正在抽奖中
+          this.awardsTypeIdObj = { //奖品类型
+               //id  名称 键值和名称都不能重复
+              '1': ['vip', 'vip'],  //1 影视会员直通车
+              '2': ['entity', '实物'], //2 实体奖 需要填写 手机号码和收货地址
+              '3': ['card', '卡密'], //3 卡密奖
+              '4': ['virtual', '虚拟将'], //4 虚拟奖
+              '5': ['coupon', '优惠券'], //5 优惠券
+              '6': ['fuka', 'fuka'], //6 福卡/周年碎片
+              '7': ['wxredbag', '现金红包'], //7 微信红包 需要调用接口拿到微信二维码
+              '8': ['phonebill', '流量话费'], //8 话费流量
+              '13': ['vipgoods', 'vipgoods'], //13 特权购买奖品
+              '14': ['consolation', 'consolation'], //14 安慰奖
+              '15': ['largeredbag', 'largeredbag'], //15 大金额红包
+              '17': ['allowance', '津贴'], //17 津贴
+              '18': ['speedup', 'speedup'], //18 加速奖品
+              '19': ['ccCoin', '金币'], //19 金币
+              '22': ['3rdpartycoupon', '第三方优惠券'], //22 第三方优惠券
+          }
+     }
+ 
       /**
-       * 奖品类型
+       * 初始化抽奖活动
        */
-      awardsTypeIdObj: { 
-           //id  名称 键值和名称都不能重复
-          '1': ['vip', 'vip'],  //1 影视会员直通车
-          '2': ['entity', '实物'], //2 实体奖 需要填写 手机号码和收货地址
-          '3': ['card', '卡密'], //3 卡密奖
-          '4': ['virtual', '虚拟将'], //4 虚拟奖
-          '5': ['coupon', '优惠券'], //5 优惠券
-          '6': ['fuka', 'fuka'], //6 福卡/周年碎片
-          '7': ['wxredbag', '现金红包'], //7 微信红包 需要调用接口拿到微信二维码
-          '8': ['phonebill', '流量话费'], //8 话费流量
-          '13': ['vipgoods', 'vipgoods'], //13 特权购买奖品
-          '14': ['consolation', 'consolation'], //14 安慰奖
-          '15': ['largeredbag', 'largeredbag'], //15 大金额红包
-          '17': ['allowance', '津贴'], //17 津贴
-          '18': ['speedup', 'speedup'], //18 加速奖品
-          '19': ['ccCoin', '金币'], //19 金币
-          '22': ['3rdpartycoupon', '第三方优惠券'], //22 第三方优惠券
-      },
+      async initDrawTask() { 
+          let res = await ccApi.backend.act.initDrawTask()
+          console.log('转盘活动初始化: ' + JSON.stringify(res))
+          if(res.code == '50003' || res.code === '50042') {
+               ccStore.state.actStates = 'end'
+          } else if(res.code != '50100') {
+               console.error(res.code + res.msg)
+               return {resMsg: false}
+          } 
+          let {isVip, vipType, overNum, belongVip, startDayNum} = res.data,
+               info = ccStore.state.luckDrawInfo;
+          info.isVip = isVip
+          info.vipType = vipType
+          info.overNum = overNum
+          info.belongVip = belongVip
+          info.startDayNum = startDayNum
+          return {resMsg: true, overNum}
+      }
       /**
        * 根据奖品英文类型获取对应的中文名称（我的奖品页面需要显示奖品类型）
        * @param {String} type 
@@ -37,7 +61,7 @@ import _url from '../api/backend/url.js'
                      return o[key][1]
                 }
            }
-      },
+      }
      /**
       * 获取我的奖品列表
       * @returns Map 返回按要求排序的我的奖品Map
@@ -75,7 +99,7 @@ import _url from '../api/backend/url.js'
           })
           m = this._sortMyReward(m)
           return m
-      },
+      }
       /**
        * 给我的奖品排序
        * @param {*} m 我的奖品Map
@@ -101,7 +125,7 @@ import _url from '../api/backend/url.js'
           m.sort((a,b) => order[getId(a)] - order[getId(b)])
           m = new Map(m)
           return m
-      },
+      }
      /**
       * 领取奖励接口
       * 封装了各种奖品的判断领取逻辑
@@ -126,7 +150,7 @@ import _url from '../api/backend/url.js'
           res =await ccApi.backend.act.receiveMyReward(param);
         console.log('领奖:' + JSON.stringify(res))
         return res
-     },
+     }
      /**
       * 显示奖品弹窗，如果有多个，会依次显示
       * @param {Object | Array[Object]} awards 后台返回的奖品列表，可以是Object（单个奖品）或Array[Object]（多个奖品）
@@ -145,7 +169,7 @@ import _url from '../api/backend/url.js'
                res = await this._showSpecificRewardDlg(item, ctx, dialog)
           }
           return res
-     },
+     }
      /**
       * 显示用户点击奖品时的弹窗
       */ 
@@ -195,7 +219,7 @@ import _url from '../api/backend/url.js'
                     break
            }
            return res
-     },
+     }
      /**
       * 显示用户点击’已领取‘商品时的弹窗
       * @param {Object} item 奖品信息
@@ -254,7 +278,7 @@ import _url from '../api/backend/url.js'
           //未特殊处理的显示toast
           ccToast.show('提示<br>奖品已领取') 
           return true
-     },
+     }
      /**
       * 谢谢参与
       */
@@ -276,7 +300,7 @@ import _url from '../api/backend/url.js'
                     ctx.bindKeys()
                }
           }) 
-     },
+     }
      /**
       * 领取金币
       * @param {} item 
@@ -330,7 +354,7 @@ import _url from '../api/backend/url.js'
                params: [{'url': url}]
           })
           return ret
-     },
+     }
      /**
       * 领取红包
       */
@@ -395,7 +419,7 @@ import _url from '../api/backend/url.js'
                }
           }) 
           return true
-     },
+     }
      /**
       * 领取vip天数
       * @param {*} item 
@@ -457,7 +481,7 @@ import _url from '../api/backend/url.js'
                     }
                }) 
           return ret
-     },
+     }
      /**
       * 领取优惠券
       * @param {*} item 
@@ -520,7 +544,7 @@ import _url from '../api/backend/url.js'
                params: [onclickData.param]
           })
           return res
-     },
+     }
      /**
       * 领取实体奖
       */
@@ -578,7 +602,7 @@ import _url from '../api/backend/url.js'
                }
           })
           return true 
-     },
+     }
      /**
       * 显示已领取实体奖
       * @param {*} item 
@@ -614,7 +638,7 @@ import _url from '../api/backend/url.js'
                          ctx.bindKeys()
                     }
                }) 
-     },
+     }
      /**
       * 领取卡密 
       * */ 
@@ -721,7 +745,92 @@ import _url from '../api/backend/url.js'
           }
           ctx.bindKeys()
           return ret
-     },
+     }
+     /**
+      * 获取中奖消息，并自动滚动
+      * @param {JQuery Object} ul 中奖消息滚动的父元素ul
+      */
+     async showLuckyNews(ul) {
+          let res = await ccApi.backend.act.getLuckyNews()
+          console.log('中奖消息: ' + JSON.stringify(res))
+          if(res.code !== '50100') {
+              return
+          }
+          let news = res.data,
+              li = '',
+              list = news.fakeNews.map(item => {
+                  let name = item.nickName, 
+                      nameLen = name.length,
+                      award = item.awardName;
+                  name = nameLen > 5 ? name.charAt(0)+'****'+name.charAt(nameLen-1) : name
+                  // award = award.length > 3 ? award.slice(0,3).concat('...') : award
+                  return `恭喜 ${name} 抽中 ${award}`
+              })
+          list.forEach(item => {
+              li += `<li>${item}</li>`
+          })
+          ul.empty().html(li)
+          animate.autoScrollUp(ul)
+      }
+      /**
+       * 点击抽奖
+       * @param {Object} ctx 调用抽奖的上下文this
+       * @returns {Object} state: false 抽奖失败 true 抽奖成功
+       */      
+      async clickLuckDraw(ctx) {
+          let ret = {
+               state: false
+         };
+          if(this.isDrawingNow) {return ret}
+          this.isDrawingNow = true
+          let info = ccStore.state.luckDrawInfo, //todo 抽奖信息需要放在抽奖class中，不放store
+              res;
+          switch(true) {
+               case (ccStore.state.actStates === 'end'):
+                    ccToast.show('提示<br>本次活动已结束，谢谢参与!');
+                    break;
+               case (!ccStore.state.hasLogin):
+                    common.goLogin()
+                    break;
+               case (!ccStore.state.luckDrawInfo.isVip):
+                    ccToast.show('提示<br>抱歉~您还不是VIP会员~')
+                    break;
+               case  (info.overNum < 1):
+                    ccToast.show('抱歉，您今日抽奖次数已用完啦<br>购买VIP赢继续抽奖机会~')
+                    break;
+               default:
+                    ccData.submitLogClick({
+                         page_name: '活动主页面',
+                         activity_stage: ccData.activity_stage,
+                         button_name: '立即抽奖',
+                         button_state: ccStore.state.luckDrawInfo.belongVip 
+                     })
+                     res = await ccApi.backend.act.doLuckDraw()
+                     console.log('抽奖: ' + JSON.stringify(res))
+                     if(res.code === '50004') { //移动端用完抽奖机会
+                         info.overNum = 0
+                         ret = {
+                              state: true,
+                              overNum: 0
+                         }
+                         ccToast.show('抱歉，您今日抽奖次数已用完啦<br>购买VIP赢继续抽奖机会~')
+                         return 
+                     } else if(res.code !== '50100') {
+                         ccToast.show('提示<br>网络异常请重试~')
+                         return 
+                     } else {
+                         ret = {
+                              state: true,
+                              overNum: --info.overNum
+                         }
+                         await this.drawLuckAnimate('homeGoLuckDraw', res.data.seq)
+                         await this.showRewardDialog(res.data, ctx)
+                    }
+                    break;
+          }
+          this.isDrawingNow = false
+          return ret          
+      }
      /**
       * 转盘抽奖动画
       */
@@ -759,4 +868,5 @@ import _url from '../api/backend/url.js'
      }
  }
 
- export default myaward
+ const drawLuck = new DrawLuck()
+ export default drawLuck

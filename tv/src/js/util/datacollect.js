@@ -1,8 +1,8 @@
 /**
- * 数据采集-中间件层，
+ * 数据采集类，
  * 在原子api基础上，封装页面共同的业务逻辑层
  */
-import util from '../util/index.js'
+import common from './common.js'
 // import './cm.js'
  /**
  * 数据采集
@@ -29,7 +29,7 @@ class MyData {
      }
 
      init() {
-          this.timePageStart = util.getNowTimeSecond()
+          this.timePageStart = common.getNowTimeSecond()
           console.log('data init, start time: ' + this.timePageStart)
           this.activity_name = '418会员日电视端'
           this.activity_type = 'OKR活动'

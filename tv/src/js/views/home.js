@@ -1,6 +1,6 @@
 /**
  * 活动首页
- * 处理跟页面相关的逻辑
+ * 处理跟页面交互相关的逻辑
  */
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
@@ -15,7 +15,6 @@ var homePage = new ccView({
         title: 'home page title',
         tips: 'this is some text used to placeholding............',
         curFocus: 0,
-        isDrawingNow: false,//按钮正在抽奖中
         pageRefreshTimer: null, //页面刷新瓜分剩余天数和库存的timer
     },
     getBtns() {
@@ -86,8 +85,7 @@ var homePage = new ccView({
                 })
                 break; 
             case 'homeGoLuckDraw':
-                res = await ctx._homeClickLuckDraw()
-                if(!res) { ctx.data.isDrawingNow = false }
+                await ctx._drawLuck()
                 break;
             case 'backTopId':
                 ccData.submitLogClick({
@@ -224,13 +222,11 @@ var homePage = new ccView({
         this.refreshQrCode()
         this._getLuckyNews()
         await this.initDividTask()
-        if(ccStore.state.hasLogin) {
-            await this.initDrawTask()
-        } else if(ccStore.state.actStates === 'end') {
+        await this.initDrawTask()
+        if(ccStore.state.actStates === 'end') {
             this._updateActEndUI()
         }
         await this.initSeckillActivity()
-
         if(ccStore.state.actStates === 'end' || ccStore.state.luckDrawInfo.startDayNum >= 10) { //活动结束
             $('#seckillShowTmrItems').remove()
         }
@@ -283,9 +279,6 @@ var homePage = new ccView({
             els.eq(1).css('background-image', `url(${require('../../images/home/2labelyeartencent.png')})`)    
         }
     },
-    async autoCollectCoupon(data) { 
-        $(`${this.id} .left-day`).text(res.data.dayNum)
-    },
     async initDividTask() { 
         let res = await mw.divid.initDividTask()
         if(res) {
@@ -301,26 +294,10 @@ var homePage = new ccView({
         $('#homeGoLuckDraw').css('background-image', `url(${require('../../images/draw/btnend.png')})`)
     },
     async initDrawTask() { 
-        try {
-            let res = await ccApi.backend.act.initDrawTask()
-            console.log('转盘init: ' + JSON.stringify(res))
-            if(res.code == '50003' || res.code === '50042') {
-                ccStore.state.actStates = 'end'
-                this._updateActEndUI()
-            } else if(res.code != '50100') {
-                throw new Error(res.code + res.msg)
-            } 
-            let {isVip, vipType, overNum, belongVip, startDayNum} = res.data,
-                info = ccStore.state.luckDrawInfo;
-            info.isVip = isVip
-            info.vipType = vipType
-            info.overNum = overNum
-            info.belongVip = belongVip
-            info.startDayNum = startDayNum
-            $(`${this.id}`).find('.draw-num').text('X' + overNum)
-        } catch(e) {
-            // ccToast.show('提示<br>' + e)
-            console.error(e)
+        if(!ccStore.state.hasLogin) return  //未登录不能初始化抽奖
+        let res = await mw.myaward.initDrawTask()
+        if(res.resMsg) {
+            $(`${this.id}`).find('.draw-num').text('X' + res.overNum)
         }
     },
     async refreshQrCode() {
@@ -341,34 +318,8 @@ var homePage = new ccView({
         })                                                           
     },
     async _getLuckyNews() {
-        let res = await ccApi.backend.act.getLuckyNews()
-        console.log('中奖消息: ' + JSON.stringify(res))
-        if(res.code !== '50100') {
-            return
-        }
-        this._updateLuckyNews(res.data)
-    },
-    _updateLuckyNews(news) {
-        let li = '',
-            ul = $('#homeLuckyNewsList'),
-            list = news.fakeNews.map(item => {
-                let name = item.nickName, nameLen = name.length,
-                    award = item.awardName;
-                name = nameLen > 5 ? name.charAt(0)+'****'+name.charAt(nameLen-1) : name
-                // award = award.length > 3 ? award.slice(0,3).concat('...') : award
-                return `恭喜 ${name} 抽中 ${award}`
-            })
-        list.forEach(item => {
-            li += `<li>${item}</li>`
-        })
-        ul.empty().html(li)
-        function _animScrollTop() {
-            let $first = ul.find('li:first'), h = $first.height()
-            $first.animate({ marginTop: `${-h}px` }, 500, function(){
-                $first.css('marginTop', 0).appendTo(ul)
-            })
-        }
-        setInterval(_animScrollTop, 2000)
+        let ul = $('#homeLuckyNewsList')
+        await mw.myaward.showLuckyNews(ul)
     },
     async initSeckillActivity(day=0) {
         let res = await mw.seckill.initSeckillItems(day)
@@ -396,51 +347,15 @@ var homePage = new ccView({
         ccStore.state.goVipBuyPage = true
         ccApi.tv.startMovieMemberCenter({sourceId: (info.vipSourceId[idx]).toString()})        
     },
-    async _homeClickLuckDraw() {
-        if(this.data.isDrawingNow) {return true}
-        this.data.isDrawingNow = true
-        let info = ccStore.state.luckDrawInfo,
-            res;
-        if(ccStore.state.actStates === 'end') {
-            ccToast.show('提示<br>本次活动已结束，谢谢参与!')
-            return
-        }
-        if(!ccStore.state.hasLogin) {
-            this._goLogin()
-            return 
-        }
-        if(!ccStore.state.luckDrawInfo.isVip) {
-            ccToast.show('提示<br>抱歉~您还不是VIP会员~')
-            return
-        }
-        if (info.overNum < 1) {
-            ccToast.show('抱歉，您今日抽奖次数已用完啦<br>购买VIP赢继续抽奖机会~')
-            return 
-        }
-        ccData.submitLogClick({
-            page_name: '活动主页面',
-            activity_stage: ccData.activity_stage,
-            button_name: '立即抽奖',
-            button_state: ccStore.state.luckDrawInfo.belongVip 
-        })
-        res = await ccApi.backend.act.doLuckDraw()
-        console.log('抽奖: ' + JSON.stringify(res))
-        if(res.code === '50004') {
-            info.overNum = 0
-            $(`${this.id}`).find('.draw-num').text('X0')
-            ccToast.show('抱歉，您今日抽奖次数已用完啦<br>购买VIP赢继续抽奖机会~')
-            return 
-        } else if(res.code !== '50100') {
-            ccToast.show('提示<br>网络异常请重试~')
-            return 
-        }
-        $(`${this.id}`).find('.draw-num').text('X' + --info.overNum)
-        $('#homeGoLuckDraw').removeClass('btn-focus')
+    async _drawLuck() { 
         this.unbindKeys()
-        await mw.myaward.drawLuckAnimate('homeGoLuckDraw', res.data.seq)
-        await mw.myaward.showRewardDialog(res.data, this)
+        $('#homeGoLuckDraw').removeClass('btn-focus')
+        let res = await mw.myaward.clickLuckDraw(this)
+        if(res.state) {
+            $(`${this.id}`).find('.draw-num').text(`X${res.overNum}`)
+        }
         this.bindKeys()
-        // $('#homeGoLuckDraw').addClass('btn-focus')
+
     },
 
 })

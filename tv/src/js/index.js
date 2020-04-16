@@ -16,7 +16,6 @@ import homePage from './views/home.js'
 import awardPage from './views/award.js'
 import seckillPage from './views/seckill.js'
 import rulesPage from './views/rules.js'
-import util from './util/index.js'
 
 window.ccMap = ccMap
 window.ccStore = store
@@ -127,7 +126,7 @@ var ccMain = {
                             button_name: '返回键'
                         }) 
                         if(ccStore.state.actStates !== 'end') {
-                            await util.sleep(800) //bugfix 主页返回键delay800，fix从二级页面连续快速按返回键焦点问题
+                            await ccUtil.sleep(800) //bugfix 主页返回键delay800，fix从二级页面连续快速按返回键焦点问题
                             this.showDialogAskUserStay()
                         } else {
                             ccApp.exitPage();
