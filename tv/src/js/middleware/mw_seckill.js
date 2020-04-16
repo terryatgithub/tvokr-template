@@ -44,6 +44,26 @@ class SeckillMiddleware {
           return true
       }
 
+      
+    /**
+     * 获取我的秒杀商品列表
+     */
+     async getMySecKillList() {
+          let res = await ccApi.backend.shopping.getSecKillMyList()
+          console.log('我的秒杀：' + res)
+          res = JSON.parse(res)
+          if(!(res.returnCode === '200' || res.returnCode === '300001')) {
+               ccToast.show('提示<br>网络异常请重新进入')
+               return false
+          }
+          ccData.submitLogShow({
+               page_name: '我的秒杀页',
+               page_state: res.data && res.data.length ? '已有秒杀订单' : '未有秒杀订单',
+               activity_stage: ccData.activity_stage
+          })   
+          return true
+     }
+     
       /**
        * 获取当前轮次的商品信息
        * @param {Array[Object]} list 后台返回的秒杀商品列表

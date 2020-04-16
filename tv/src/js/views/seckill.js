@@ -1,6 +1,7 @@
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
 import router from '../router/route.js'
+import mw from '../middleware/middleware.js'
 import '../../css/seckill.scss'
 
 var seckillPage = new ccView({
@@ -51,20 +52,9 @@ var seckillPage = new ccView({
 		console.log('--seckillPage destroyed')
 		$(this.id).hide()
     },
-    async _getSecKillMyList() {
-        let res = await ccApi.backend.shopping.getSecKillMyList()
-        console.log('我的秒杀：' + res)
-        res = JSON.parse(res)
-        if(!(res.returnCode === '200' || res.returnCode === '300001')) {
-            ccToast.show('提示<br>网络异常请重新进入')
-            return
-        }
-        this._updatePageInfo(res.data)
-        ccData.submitLogShow({
-            page_name: '我的秒杀页',
-            page_state: res.data && res.data.length ? '已有秒杀订单' : '未有秒杀订单',
-            activity_stage: ccData.activity_stage
-        })   
+    async _getSecKillMyList() {  
+        let res = await mw.seckill.getMySecKillList()
+        res && this._updatePageInfo(res.data)
     },
     _updatePageInfo(list) {
         if(!list || !list.length) { return }
