@@ -1,6 +1,6 @@
 /**
  * 我的奖品相关接口-中间件层，
- * 在原子api基础上，封装页面共同的业务逻辑层
+ * 在后台api基础上，封装页面共同的业务逻辑层
  */
 import _url from '../api/backend/url.js'
 
@@ -26,6 +26,10 @@ import _url from '../api/backend/url.js'
           '19': ['ccCoin', '金币'], //19 金币
           '22': ['3rdpartycoupon', '第三方优惠券'], //22 第三方优惠券
       },
+      /**
+       * 根据奖品英文类型获取对应的中文名称（我的奖品页面需要显示奖品类型）
+       * @param {String} type 
+       */
       getChineseNameByType(type) {
            let o = this.awardsTypeIdObj
            for(let key in o) {
@@ -36,10 +40,11 @@ import _url from '../api/backend/url.js'
       },
      /**
       * 获取我的奖品列表
+      * @returns Map 返回按要求排序的我的奖品Map
       */
       async getMyReward() {
-          let p1 = ccApi.backend.act.getMyReward(),
-              p2 = ccApi.backend.act.getMyReward(1);
+          let p1 = ccApi.backend.act.getMyReward(), //瓜分活动
+              p2 = ccApi.backend.act.getMyReward(1); //抽奖活动
           let [res1, res2] = await Promise.all([p1, p2])
           if(res1.code !== '50100' || res2.code !== '50100') {
                ccToast.show('提示<br>网络异常，请重新进入')
@@ -51,7 +56,7 @@ import _url from '../api/backend/url.js'
           console.log('我的奖品: ' + JSON.stringify(res))          
           let allAwards = res, m = new Map()
           allAwards.length && allAwards.forEach(item => {
-               if(item.awardTypeId === '14') return;
+               if(item.awardTypeId === '14') return; //过滤谢谢参与奖
                let type = this.awardsTypeIdObj[item.awardTypeId][0]
                !m.has(type) && m.set(type, [])
                if(item.awardTypeId === '19') { //合并金币（分未领取 已领取)
@@ -73,10 +78,11 @@ import _url from '../api/backend/url.js'
       },
       /**
        * 给我的奖品排序
-       * @param {*} m 
+       * @param {*} m 我的奖品Map
        */
       _sortMyReward(m) {
           m = [...m]
+          //获取指定奖品对应的奖品id
           let getId = (v) => {
                for(let [key, value] of Object.entries(this.awardsTypeIdObj)) {
                     if(value[0] === v[0]) {
@@ -84,7 +90,7 @@ import _url from '../api/backend/url.js'
                     }
                }     
           }
-          //奖品种类排序内容：现金红包>金币>优惠券>实物>卡密
+          //奖品种类排序内容，418 OKR要求：现金红包>金币>优惠券>实物>卡密
           let order = { //7>19>5>2>3     
                7: 1,
                19: 2,
@@ -97,38 +103,35 @@ import _url from '../api/backend/url.js'
           return m
       },
      /**
-      * 页面领取奖励接口
+      * 领取奖励接口
       * 封装了各种奖品的判断领取逻辑
       * @param {object} info 
       */
      async receiveReward(info) {
-        let res;
-        // let {
-        //     minBonus,
-        //     invalidDay,
-        //     businessVersion            
-        // } 
-        let {
-            activeId, 
-            awardId,
-            lotteryAwardRememberId : rememberId,
-            userKeyId,
-            awardTypeId
-        } = info
-        let param = {
-            activeId, 
-            awardId,
-            rememberId,
-            userKeyId,
-            awardTypeId
-        }
-        res =await ccApi.backend.act.receiveMyReward(param)
+        let 
+          {
+               activeId, 
+               awardId,
+               lotteryAwardRememberId : rememberId,
+               userKeyId,
+               awardTypeId
+          } = info,
+          param = {
+               activeId, 
+               awardId,
+               rememberId,
+               userKeyId,
+               awardTypeId
+          },
+          res =await ccApi.backend.act.receiveMyReward(param);
         console.log('领奖:' + JSON.stringify(res))
         return res
      },
      /**
       * 显示奖品弹窗，如果有多个，会依次显示
-      * @param {*} awards 
+      * @param {Object | Array[Object]} awards 后台返回的奖品列表，可以是Object（单个奖品）或Array[Object]（多个奖品）
+      * @param {this} ctx 调用此接口的上下文this,用于页面焦点处理、恢复等
+      * @param {boolean} dialog true:显示弹窗  false: 不显示弹窗，自动静默领取
       */
      async showRewardDialog(awards, ctx, dialog=true) {
           let list = [], res
@@ -144,62 +147,7 @@ import _url from '../api/backend/url.js'
           return res
      },
      /**
-      * 检查是否已领取 true: 已领取 
-      */
-     async _isCollected(item, ctx) {
-          if(!item.awardExchangeFlag) {
-               return false
-          }
-          switch (parseInt(item.awardTypeId, 10)) { // 奖品类型说明
-               case 1: //影视会员直通车（瓜分天数）
-                    await this._collectVip(item, ctx)   
-                    return true
-               case 2: //实体奖 需要填写 手机号码和收货地址 
-                    await this._showCollectedEntityAward(item, ctx)
-                    return true
-               case 3: //卡密奖 
-                    await this._collectKami(item, ctx)
-                    return true
-               case 4: //虚拟奖 
-                    break
-               case 5: //优惠券 
-                    if(item.awardExchangeFlag == 2) {
-                         ccToast.show('提示<br>奖品已使用')
-                    } else if(item.awardExchangeFlag == 3) {
-                         ccToast.show('提示<br>奖品已过期')
-                    } else {
-                         await this._collectCoupon(item,ctx)
-                    }
-                    return true
-               case 6: //福卡/周年碎片 
-                    break
-               case 7: //微信红包 需要调用接口拿到微信二维码 
-                    // await this._collectRedBag(item, ctx)
-                    // return true
-                    break;
-               case 8: //话费流量 
-                    break
-               case 13: //特权购买奖品 
-                    break
-               case 14: //安慰奖 
-                    return false //谢谢参与不显示‘已领取’
-               case 15: //大金额红包 
-                    break
-               case 17: //津贴 
-                    break
-               case 18: //加速奖品
-                    break
-               case 19: //金币 
-                    await this._collectCoin(item, ctx, true)
-                    return true
-               case 22: //第三方优惠券 
-                    break
-          }
-          ccToast.show('提示<br>奖品已领取')
-          return true
-     },
-     /**
-      * 显示指定奖品对应的弹窗
+      * 显示用户点击奖品时的弹窗
       */ 
      async _showSpecificRewardDlg(item, ctx, dialog=true) {
           let res
@@ -247,6 +195,65 @@ import _url from '../api/backend/url.js'
                     break
            }
            return res
+     },
+     /**
+      * 显示用户点击’已领取‘商品时的弹窗
+      * @param {Object} item 奖品信息
+      *        {Object} ctx 调用接口的上下文this
+      * @returns true: 已领取 
+      */
+     async _isCollected(item, ctx) {
+          if(!item.awardExchangeFlag) { //未领取
+               return false
+          }
+          switch (parseInt(item.awardTypeId, 10)) { // 奖品类型说明
+               case 1: //影视会员直通车（瓜分天数）
+                    await this._collectVip(item, ctx)   
+                    return true
+               case 2: //实体奖 需要填写 手机号码和收货地址 
+                    await this._showCollectedEntityAward(item, ctx)
+                    return true
+               case 3: //卡密奖 
+                    await this._collectKami(item, ctx)
+                    return true
+               case 4: //虚拟奖 
+                    break
+               case 5: //优惠券 
+                    if(item.awardExchangeFlag == 2) {
+                         ccToast.show('提示<br>奖品已使用')
+                    } else if(item.awardExchangeFlag == 3) {
+                         ccToast.show('提示<br>奖品已过期')
+                    } else {
+                         await this._collectCoupon(item,ctx)
+                    }
+                    return true
+               case 6: //福卡/周年碎片 
+                    break
+               case 7: //微信红包 需要调用接口拿到微信二维码 
+                    // await this._collectRedBag(item, ctx)
+                    // return true
+                    break;
+               case 8: //话费流量 
+                    break
+               case 13: //特权购买奖品 
+                    break
+               case 14: //安慰奖 
+                    return false //谢谢参与不显示‘已领取’
+               case 15: //大金额红包 
+                    break
+               case 17: //津贴 
+                    break
+               case 18: //加速奖品
+                    break
+               case 19: //金币 
+                    await this._collectCoin(item, ctx, true)
+                    return true
+               case 22: //第三方优惠券 
+                    break
+          }
+          //未特殊处理的显示toast
+          ccToast.show('提示<br>奖品已领取') 
+          return true
      },
      /**
       * 谢谢参与
@@ -316,7 +323,7 @@ import _url from '../api/backend/url.js'
           let url = ccUtil.isProdMode() ? 
                     'https://goldshop.coocaa.com' : 
                     'https://beta-goldshop.coocaa.com';
-          ccApp.startCommonPage({ //todo 去使用金币url更换
+          ccApp.startCommonPage({
                type: 'action',
                packageName: 'com.coocaa.app_browser',
                actionName: 'coocaa.intent.action.browser.no_trans',
@@ -723,7 +730,7 @@ import _url from '../api/backend/url.js'
               arr = Array.from(els), 
               len = arr.length, 
               sort = [
-                   [0,1,2,4,7,6,5,3], //0-7为中间按钮的兄弟节点的排序；转动顺序为从左上角顺时针旋转
+                   [0,1,2,4,7,6,5,3], //0-7为抽奖按钮的兄弟节点的排序；转动顺序为从左上角顺时针旋转
                    [4,1,2,3,8,7,6,5,5] //奖品对转动顺序的map，比如谢谢参与seq为0，在第二排最右边，要转4下，所以最后一圈沿顺时针转到4
               ],
               round =async (time, total = len) => {

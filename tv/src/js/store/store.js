@@ -16,7 +16,19 @@ var store = {
         userInfo: {},
         userToken: '',
         hasLogin: false,
-        seckillGoodsInfo: {},
+        luckDrawInfo: { //抽奖任务相关
+            isVip: false,
+            vipType: 0,
+            overNum: 0,
+            vipSourceId: {
+                'movieiyiqi': 1, //影视奇异
+                'movietencent': 5, //影视腾讯
+                'edu': 58, //教育
+                'kid': 57, //少儿
+                'game': 56 //电竞
+            }
+        },
+        seckillGoodsInfo: {}, //秒杀商品活动id，调用秒杀后台接口需要
         goVipBuyPage: false,
         goLoginPage: false,
         homepageVersion: 0,
@@ -43,7 +55,7 @@ var store = {
                 userKeyId: state.userKeyId ? state.userKeyId : ''
             };
             if(process.env.NODE_ENV === 'mock' || ccDebug.isPCMode()) {
-                r.cNickName = 'task' //转盘任务初始化
+                r.cNickName = '默认名' //转盘任务初始化
                 // r.cNickName = 'yes' //已登录并瓜分成功
                 // r.cNickName = 'no'  //已登录但没有瓜分资格
                 // r.mustLogin = false //未登录

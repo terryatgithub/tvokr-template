@@ -1,9 +1,10 @@
+/**
+ *  酷开底层接口，酷开系统提供的底层能力，
+ *  不做逻辑处理，仅封装为Promise形式
+ */
 import util from "../../util"
 
-/**
- *  底层接口，封装为Promise, 酷开系统提供的底层能力
- */
-class LowLayerApi {
+ class LowLayerApi {
     static getInstance() {
         if (!this.instance) {
             this.instance = new LowLayerApi()

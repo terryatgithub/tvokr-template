@@ -1,3 +1,6 @@
+/**
+ * 活动后台接口
+ */
 import urls from './url.js'
 import md5 from 'md5'
 
@@ -20,7 +23,6 @@ class ActivityBackendApi {
     }
 
     constructor() {
-        //
     }
     
     /**
@@ -98,6 +100,10 @@ class ActivityBackendApi {
         return res
     }
 
+    /**
+     * 抽奖
+     * @param {boolean} type 
+     */
     async doLuckDraw(type) {
         console.log('act doLuckDraw')
         let data = {
@@ -109,6 +115,26 @@ class ActivityBackendApi {
         data.token = md5(token)
         let res = await ccUtil.post({
             url: _urls.draw,
+            data
+        })
+        return res
+    }
+
+    /**
+     * 领奖
+     * @param {object} awardInfo 传入领取的奖品信息
+     */
+    async receiveMyReward(awardInfo) {
+        console.log('act receive reward') 
+        let data = {
+                ...ccStore.getters.commonParam(),
+                id: ccStore.state.actId.draw,
+                ...awardInfo
+            },
+            token = `aw=${data.rememberId}&re=${data.userKeyId}&u=${data.awardTypeId}&t=${data.activeId}&p=${data.cOpenId}&0y8LiSu7DNcIUqlW`;
+        data.token = md5(token)
+        let res = await ccUtil.get({
+            url: _urls.receiveMyReward,
             data
         })
         return res
@@ -127,27 +153,7 @@ class ActivityBackendApi {
             }
         })
         return res
-    }
-
-    /**
-     * 领取奖品
-     * @param {object} awardInfo 传入领取的奖品信息
-     */
-    async receiveMyReward(awardInfo) {
-        console.log('act receive reward') 
-        let data = {
-                ...ccStore.getters.commonParam(),
-                id: ccStore.state.actId.draw,
-                ...awardInfo
-            },
-            token = `aw=${data.rememberId}&re=${data.userKeyId}&u=${data.awardTypeId}&t=${data.activeId}&p=${data.cOpenId}&0y8LiSu7DNcIUqlW`;
-        data.token = md5(token)
-        let res = await ccUtil.get({
-            url: _urls.receiveMyReward,
-            data
-        })
-        return res
-    }
+    }    
 
     /**
      * 获取中奖喜讯

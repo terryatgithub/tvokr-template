@@ -1,3 +1,6 @@
+/**
+ * 秒杀后台接口
+ */
 import urls from './url.js'
 
 const _urls = {

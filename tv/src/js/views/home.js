@@ -1,8 +1,12 @@
+/**
+ * 活动首页
+ * 处理跟页面相关的逻辑
+ */
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
 import router from '../router/route.js'
 import '../../css/home.scss'
-import {myaward} from '../middleware/middleware.js'
+import mw from '../middleware/middleware.js'
 
 var homePage = new ccView({
 	name: 'home',
@@ -12,23 +16,7 @@ var homePage = new ccView({
         tips: 'this is some text used to placeholding............',
         curFocus: 0,
         hasCollectedDividend: false,//是否已经领取过瓜分权益
-        luckDrawInfo: { //抽奖任务相关
-            isVip: false,
-            vipType: 0,
-            overNum: 0,
-            vipSourceId: {
-                'movieiyiqi': 1, //影视奇异
-                'movietencent': 5, //影视腾讯
-                'edu': 58, //教育
-                'kid': 57, //少儿
-                'game': 56 //电竞
-            }
-        },
         isDrawingNow: false,//按钮正在抽奖中
-        seckillGoodsInfo: null, //秒杀商品详情
-        seckillTimer: null, //秒杀商品倒计时timer
-        seckillDayNum: 0, //获取今天的秒杀商品还是明天的
-        seckillRoundNum: 0, //当天秒杀的场次
         pageRefreshTimer: null, //页面刷新瓜分剩余天数和库存的timer
     },
     getBtns() {
@@ -55,12 +43,12 @@ var homePage = new ccView({
                         page_name: '活动主页面',
                         activity_stage: ccData.activity_stage,
                         button_name,
-                        button_state: ctx.data.luckDrawInfo.belongVip 
+                        button_state: ccStore.state.luckDrawInfo.belongVip 
                     })
                     ctx._goVipBuyPage(type)
                     break;
                 case 'seckillitem':
-                    ctx._goSeckillPage($(this))
+                    mw.seckill.goSeckillPage($(this))
                     break;
             }
             return
@@ -120,10 +108,10 @@ var homePage = new ccView({
         ctx.data.curFocus = $(this).index(ctx.getBtns())
         switch(id) {
             case 'seckillShowTodayItems':
-                ctx.initSeckillItems()
+                ctx.initSeckillActivity()
                 break;
             case 'seckillShowTmrItems':
-                ctx.initSeckillItems(1)
+                ctx.initSeckillActivity(1)
                 break;    
             case 'homeGoLuckDraw':
                 logdata = '第二屏'
@@ -242,9 +230,9 @@ var homePage = new ccView({
         } else if(ccStore.state.actStates === 'end') {
             this._updateActEndUI()
         }
-        await this.initSeckillItems()
+        await this.initSeckillActivity()
 
-        if(ccStore.state.actStates === 'end' || this.data.luckDrawInfo.startDayNum >= 10) { //活动结束
+        if(ccStore.state.actStates === 'end' || ccStore.state.luckDrawInfo.startDayNum >= 10) { //活动结束
             $('#seckillShowTmrItems').remove()
         }
         this.bindKeys()
@@ -260,7 +248,7 @@ var homePage = new ccView({
     },
 	destroyed() {
         console.log('--home destroyed')
-        this.data.seckillTimer && clearTimeout(this.data.seckillTimer)
+        mw.seckill.disableTimeout()
         this.data.pageRefreshTimer && clearTimeout(this.data.pageRefreshTimer)
 		$(this.id).hide()
     },
@@ -273,7 +261,7 @@ var homePage = new ccView({
             return 
         }        
         let p1 = ccApi.backend.act.getDividDaysLeft(),
-            p2 = this.initSeckillItems(this.data.seckillDayNum)
+            p2 = this.initSeckillActivity(mw.seckill.seckillDayNum)
         let [res1, res2] = await Promise.all([p1, p2])
         console.log('剩余天数: ' + res1.data.surplusDay)
         if(res1.code === '50100') {
@@ -318,7 +306,7 @@ var homePage = new ccView({
                 console.log('自动领取优惠券错误')
                 return
             }
-            collect = await myaward.showRewardDialog(draw.data, this, false)
+            collect = await mw.myaward.showRewardDialog(draw.data, this, false)
             console.log('领奖结果: ' + collect)
             pic = draw.data.awardUrl
         } else if(data.allUsedNumber > 0) {
@@ -347,7 +335,7 @@ var homePage = new ccView({
                 let awards = res.data.rememberEntities
                 if(awards) {
                     while(!vipRes) {//bugfix 瓜分权益失败弹窗点刷新按钮后焦点丢失问题
-                        vipRes = await myaward.showRewardDialog(awards, ctx)
+                        vipRes = await mw.myaward.showRewardDialog(awards, ctx)
                     }
                 } 
                 if(res.data.isLate) {
@@ -405,7 +393,7 @@ var homePage = new ccView({
                 throw new Error(res.code + res.msg)
             } 
             let {isVip, vipType, overNum, belongVip, startDayNum} = res.data,
-                info = this.data.luckDrawInfo;
+                info = ccStore.state.luckDrawInfo;
             info.isVip = isVip
             info.vipType = vipType
             info.overNum = overNum
@@ -464,245 +452,12 @@ var homePage = new ccView({
         }
         setInterval(_animScrollTop, 2000)
     },
-    async initSeckillItems(day=0) {
-        try {
-            console.log('startdaynum: ' + this.data.luckDrawInfo.startDayNum)
-            if(this.data.luckDrawInfo.startDayNum > 10) {
-                day = 10 - this.data.luckDrawInfo.startDayNum
-            }
-            this.data.seckillDayNum = day
-            let res = await ccApi.backend.shopping.getSeckillGoodsList({
-                source: ccStore.state.source,
-                day
-            })
-            console.log( 'day: ' + day + '; 秒杀商品列表: ' + JSON.stringify(res))
-            res = JSON.parse(res)
-            if(res.returnCode != '200' || res.data.length === 0) {
-                console.error('提示<br>秒杀商品获取失败或为空')    
-                return
-            }
-            let list = res.data,
-                arr = this._seckillCheckRound(res.data),
-                products = arr.reduce((prev, cur) => {
-                    prev.push(list[cur])
-                    return prev
-                }, [])
-            this._seckillItemsUpdate(products)
-            this.data.seckillGoodsInfo = products
-            this.bindKeys()
-            this.data.seckillTimer && clearTimeout(this.data.seckillTimer)
-            this._seckillItemsCountdown()
-        } catch(e) {
-            console.error('提示<br>秒杀商品获取失败')
-        }
-    },
-    _seckillCheckRound(list) { //判断是当天第几场活动
-        let now = ccUtil.getNowTimeSecond() * 1000, halfHour = 1800000, 
-            round = 0, len = list.length, ret = [],
-            start, normalNum, curRoundIndex;
-        if(list[0].sortOrder === 17) {
-            ret.push(0)
-        }
-        if(list[1].sortOrder === 16) {
-            ret.push(1)
-        }
-        start = ret.length
-        normalNum = 5 - start
-        if(now < list[start].activity_end_time + halfHour) {
-            round = 0
-        } else if(now < list[5].activity_end_time + halfHour) {
-            round = 1
-        } else if(len > 10) {
-            round = 2
-        }
-        this.data.seckillRoundNum = round
-        curRoundIndex = [...list.keys()].slice(start + round * normalNum, start + (round+1) * normalNum)       
-        ret.push.apply(ret, curRoundIndex)
-        console.log('seckill list: ' + JSON.stringify(ret))
-        return ret.reverse()
-    },
-    _seckillItemsUpdate(data) {
-        let all = '', ul = $('#homeSeckillItemList'), goodsId = [],
-            upTarget = this.data.seckillDayNum ? '#seckillShowTmrItems' : '#seckillShowTodayItems';
-        data.forEach((item, index) => {
-            goodsId.push(item.activity_id)
-            let img = item.activity_poster_img,
-                oldPrice = item.commodityInfo.commodity_original_price,
-                newPrie = item.activity_price,
-                soldPercent = ((1 - (item.activity_number/item.all_stock).toFixed(2))*100).toFixed(0),
-                start = item.activity_start_time,
-                end = item.activity_end_time,
-                stock = item.activity_number,
-                allstock = item.all_stock,
-                rightTarget = (index == 4) ? '#' : '';
-            all += `<li class="coocaa_btn" upTarget="${upTarget}" rightTarget="${rightTarget}" data-actid="${item.activity_id}" data-start="${start}" data-end="${end}" data-stock="${stock}" data-allstock="${allstock}"  data-type="seckillitem" data-id=${index}>
-                    <img class="product" src="${img}"/>
-                    <div class="countdown">
-                        <span></span><span></span>								
-                    </div>
-                    <div class="prize-zone">
-                        <div>原价￥${oldPrice}</div>
-                        <div>￥${newPrie}</div>
-                        <div><div class="progress"></div></div>
-                        <div>已售<span class="progresspercent">${soldPercent}</span>%</div>
-                    </div>
-                    <div class="btn_seckill"></div>
-                    <img class="focusbg" src="${require('../../images/home/4framefocus.png')}"/>
-                </li>`
-        })
-        ccStore.state.seckillGoodsInfo.seckillGoodsId = goodsId.join()
-        ul.empty().html(all)
-    },
-    _seckillItemsCountdown() {
-        let ctx = this,
-            ul = $('#homeSeckillItemList'),
-            now = +new Date(), 
-            halfHour = 1800000,// 30*60*1000
-            start, end, stock,allstock,
-            state, countdown,soldPercent,
-            actEnd = ccStore.state.actStates === 'end';
-        Array.prototype.forEach.call(ul.children(), function(item, index){
-            item = $(item)
-            start = item.attr('data-start')
-            end = item.attr('data-end')       
-            stock = item.attr('data-stock')     
-            allstock = item.attr('data-allstock')  
-            item.removeClass('ended willstart')
-            if(actEnd) {
-                state = '已结束'
-                countdown = '00:00:00'
-                item.addClass('ended')
-                item.children('.btn_seckill').text('已结束')
-                soldPercent = 100
-            } else {
-                soldPercent = ((1 - (stock/allstock).toFixed(2))*100).toFixed(0)
-                switch(true) {
-                    case (start - now) > halfHour || ((now - end) > halfHour && ctx.data.seckillRoundNum != 2): // 未开始
-                        state = '未开始'
-                        countdown = ccUtil.getcountdown(start)
-                        item.addClass('willstart')
-                        item.children('.btn_seckill').text('敬请期待')
-                        break;
-                    case (start - now) > 0 && (start - now) <= halfHour: //即将开始
-                        state = '即将开始'
-                        countdown = ccUtil.getcountdown(start)
-                        item.addClass('willstart')
-                        item.children('.btn_seckill').text('即将开始')
-                        break;
-                    case (end - now) > 0 && (end - now) <= halfHour: //即将结束
-                        if(stock>0) {
-                            state = '即将结束'
-                            countdown = ccUtil.getcountdown(end)
-                            item.children('.btn_seckill').text('立即秒杀')
-                        }else {
-                            state = '已秒光'
-                            item.addClass('ended')
-                            countdown = '00:00:00'
-                            soldPercent = 100
-                            item.children('.btn_seckill').text('已秒光')
-                        }
-                        break;
-                    case (now - end)> 0 && ((now - end) <= halfHour || ctx.data.seckillRoundNum == 2): //已结束
-                        state = '已结束'
-                        countdown = '00:00:00'
-                        soldPercent = 100
-                        item.addClass('ended')
-                        item.children('.btn_seckill').text('已结束')
-                        break;
-                    default: //秒杀中
-                        if(stock>0) {
-                            state = '秒杀中'
-                            countdown = ccUtil.getcountdown(end)
-                            item.children('.btn_seckill').text('立即秒杀')
-                        } else {
-                            state = '已秒光'
-                            item.addClass('ended')
-                            countdown = '00:00:00'
-                            soldPercent = 100
-                            item.children('.btn_seckill').text('已秒光')
-                        }
-                        break;
-                }
-            }
-            //状态，倒计时
-            item.children('.countdown').children().first().text(state)
-            item.children('.countdown').children().last().text(countdown)
-            //进度条更新
-            item.find('.progress').css('width', soldPercent+'%')
-            item.find('.progresspercent').text(soldPercent)
-        })
-        if(!actEnd) {
-            this.data.seckillTimer = setTimeout(this._seckillItemsCountdown.bind(this), 1000)
-        }
-    },
-    async _goSeckillPage(el) {
-        let index = el.attr('data-id'),
-            actId = el.attr('data-actid'),
-            productId = (this.data.seckillGoodsInfo[index]['commodity_id']).toString(),
-            round = this.data.seckillRoundNum;
-        console.log('_goSeckillPage: ' + index + 'actId: ' + actId)
-        if(ccStore.state.actStates === 'end') {
-            ccToast.show('提示<br>本次活动已结束，谢谢参与!')
-            ccData.submitLogClick({
-                page_name: '活动主页面',
-                activity_stage: ccData.activity_stage,
-                button_name: '立即秒杀' + productId,
-                button_state: `第${round+1}场-` + el.children('.btn_seckill').text(),
-            }) 
-            return
-        }
-        if(!ccStore.state.hasLogin) {
-            this._goLogin()
-            return 
-        }
-        if(!this.data.luckDrawInfo.isVip) {
-            ccToast.show('抱歉~<br>VIP会员才可参与秒杀~您还不是VIP会员')
-            return
-        }
-        ccData.submitLogClick({
-            page_name: '活动主页面',
-            activity_stage: ccData.activity_stage,
-            button_name: '立即秒杀' + productId,
-            button_state: `第${round+1}场-` + el.children('.btn_seckill').text(),
-        })            
-        let res = await ccApi.backend.shopping.getSeckillState()
-        console.log('检查秒杀状态: ' + res)
-        res = JSON.parse(res)
-        if(!(res.returnCode === '200' || res.returnCode === '300001')) { //进入时判断是否有权限
-            res = await ccApi.backend.shopping.findOrderByAct(actId) //判断用户当前点击商品是否 1.是已秒杀商品 2.是否已付款
-            console.log('检查当前商品状态: ' + res)
-            res = JSON.parse(res);
-            if(!(res.returnCode === '200' || res.returnCode === '300001')) {
-                ccToast.show('提示<br>您已参与过本场活动，请下一场再来噢~')
-                return
-            } else if(res.returnCode == '200' && res.data) {
-                if(res.data.payStatus == 2) {
-                    ccToast.show('提示<br>您已参与过本场活动，请下一场再来噢~')
-                    return
-                } else { //商品订单详情页
-                    ccApi.tv.startMallOrderDetail({
-                        orderId: res.data.orderSn //todo
-                    }) 
-                    return
-                }
-            } 
-        }        
-        if(el.hasClass('willstart')) {
-            ccToast.show('提示<br>秒杀还未开始，请稍后再来~')
-            return
-        } else if(el.hasClass('ended')) {
-            ccToast.show('哎呀来晚了~<br>该商品已被秒完啦~看看其它商品吧!')
-            return
-        }
-        
-        ccStore.state.seckillGoodsInfo.start = true
-        ccApi.tv.startMallDetail({
-            type: 'text', 
-            id: productId
-        }) 
+    async initSeckillActivity(day=0) {
+        let res = await mw.seckill.initSeckillItems(day)
+        res && this.bindKeys()
     },
     _goVipBuyPage(type) {
-        let info = this.data.luckDrawInfo, idx, ccfrom = ccUtil.getUrlParam('ccfrom');
+        let info = ccStore.state.luckDrawInfo, idx, ccfrom = ccUtil.getUrlParam('ccfrom');
         if(type === 'vipall' && ccfrom) {
             idx = ccUtil.getUrlParam('ccfrom')
         } else {
@@ -726,7 +481,7 @@ var homePage = new ccView({
     async _homeClickLuckDraw() {
         if(this.data.isDrawingNow) {return true}
         this.data.isDrawingNow = true
-        let info = this.data.luckDrawInfo,
+        let info = ccStore.state.luckDrawInfo,
             res;
         if(ccStore.state.actStates === 'end') {
             ccToast.show('提示<br>本次活动已结束，谢谢参与!')
@@ -736,7 +491,7 @@ var homePage = new ccView({
             this._goLogin()
             return 
         }
-        if(!this.data.luckDrawInfo.isVip) {
+        if(!ccStore.state.luckDrawInfo.isVip) {
             ccToast.show('提示<br>抱歉~您还不是VIP会员~')
             return
         }
@@ -748,7 +503,7 @@ var homePage = new ccView({
             page_name: '活动主页面',
             activity_stage: ccData.activity_stage,
             button_name: '立即抽奖',
-            button_state: this.data.luckDrawInfo.belongVip 
+            button_state: ccStore.state.luckDrawInfo.belongVip 
         })
         res = await ccApi.backend.act.doLuckDraw()
         console.log('抽奖: ' + JSON.stringify(res))
@@ -764,20 +519,12 @@ var homePage = new ccView({
         $(`${this.id}`).find('.draw-num').text('X' + --info.overNum)
         $('#homeGoLuckDraw').removeClass('btn-focus')
         this.unbindKeys()
-        await myaward.drawLuckAnimate('homeGoLuckDraw', res.data.seq)
-        await myaward.showRewardDialog(res.data, this)
+        await mw.myaward.drawLuckAnimate('homeGoLuckDraw', res.data.seq)
+        await mw.myaward.showRewardDialog(res.data, this)
         this.bindKeys()
         // $('#homeGoLuckDraw').addClass('btn-focus')
     },
-    _goLogin() {
-        ccToast.show('提示<br>请先登录~~')
-        ccStore.state.goLoginPage = true
-        ccData.submitLogShowLogin({
-            page_name: '418会员日活动电视端登录弹窗',
-            page_type: 'inactivityWindows'
-        }) 
-        ccApi.tv.login()
-    }
+
 })
 
 export default homePage

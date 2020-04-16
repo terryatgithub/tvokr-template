@@ -1,3 +1,6 @@
+/**
+ * 微信公众号后台接口
+ */
 import urls from './url.js'
 
 const _urls = {

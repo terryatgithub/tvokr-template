@@ -1,8 +1,9 @@
-import lowlayer from './lowlayer.js'
-
 /**
- * 中间件类，根据业务需要封装底层api
+ * 酷开底层接口-中间件类
+ * 根据业务需要封装底层api，封装了如初始化获取设备信息、登录信息
  */
+ import lowlayer from './lowlayer.js'
+
 class TVApi {
     static getInstance() {
         if(!this.instance) {
@@ -17,9 +18,11 @@ class TVApi {
 
     /**
      * 
-     * @param {*} isGetDevice false:用户登录后，只获取用户信息
+     * @param {*} isGetDevice 
+     *      默认true，既获取设备信息、也获取用户信息
+     *      false:用于用户登录状态发生改变后，只获取用户信息，不获取设备信息
      */
-    async init(isGetDevice=true) { //todo 分析这里要不要做成async 以及how？
+    async init(isGetDevice=true) { 
         console.log('ccAndroidSDK: ' + ccApp.ccAndroidSDK)
         let res
         if(isGetDevice) {
@@ -44,6 +47,34 @@ class TVApi {
             ccStore.setUserToken(res1.data.accesstoken)
             ccStore.setUserInfo(res2.data)
         }
+    }
+
+    /**
+     * 登录接口,需要用户登录时调用
+     * @returns 
+     *      如果已登录，返回true
+     *      如果未登录，调起登录页面后返回 logining
+     *      如果出错，返回false
+     *      （在监听页面登录addLoginChangedListener里的回调函数里获取登录结果)
+     */
+    async login() {
+        let source = this.source, res
+        res = await this.getLoginStatus(false)
+        console.log(`${JSON.stringify(res)}`)
+        if(!res.hasLogin) {
+            res = await lowlayer.startLogin({
+                source,
+                tencentType: res.tencentType
+            })
+            console.log(`startLogin: ${JSON.stringify(res)}`)
+            //去登陆，起登录页面，startLogin函数就跑完了；然后需要onresume里监听登录状态变化
+            console.log('调起登录页面')
+            return res = false
+        } else {
+            console.log('原本已登录: ', res)
+            res = true                              
+        }
+        return res
     }
 
     /**
@@ -115,33 +146,6 @@ class TVApi {
             })
         }
         return ret
-    }
-
-    /**
-     * 登录接口
-     * 如果已登录，返回true
-     * 如果未登录，调起登录页面后返回 logining
-     * 如果出错，返回false
-     * （在监听页面登录addLoginChangedListener里的回调函数里获取登录结果)
-     */
-    async login() {
-        let source = this.source, res
-        res = await this.getLoginStatus(false)
-        console.log(`${JSON.stringify(res)}`)
-        if(!res.hasLogin) {
-            res = await lowlayer.startLogin({
-                source,
-                tencentType: res.tencentType
-            })
-            console.log(`startLogin: ${JSON.stringify(res)}`)
-            //去登陆，起登录页面，startLogin函数就跑完了；然后需要onresume里监听登录状态变化
-            console.log('调起登录页面')
-            return res = false
-        } else {
-            console.log('原本已登录: ', res)
-            res = true                              
-        }
-        return res
     }
 
     /**
