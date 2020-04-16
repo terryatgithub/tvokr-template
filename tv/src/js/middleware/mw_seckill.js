@@ -63,7 +63,7 @@ class SeckillMiddleware {
           })   
           return true
      }
-     
+
       /**
        * 获取当前轮次的商品信息
        * @param {Array[Object]} list 后台返回的秒杀商品列表

@@ -15,7 +15,6 @@ var homePage = new ccView({
         title: 'home page title',
         tips: 'this is some text used to placeholding............',
         curFocus: 0,
-        hasCollectedDividend: false,//是否已经领取过瓜分权益
         isDrawingNow: false,//按钮正在抽奖中
         pageRefreshTimer: null, //页面刷新瓜分剩余天数和库存的timer
     },
@@ -253,14 +252,14 @@ var homePage = new ccView({
 		$(this.id).hide()
     },
     async _refreshDaysNStocks() { //刷新剩余天数和库存数
-        console.log('_refreshDaysNStocks... every 10s')
         let delay = 15000
+        console.log(`_refreshDaysNStocks... every ${delay}s`)
         this.data.pageRefreshTimer && clearTimeout(this.data.pageRefreshTimer)
         if(ccDialog.isShow()) { //如果有弹窗，delay后再继续
             this.data.pageRefreshTimer = setTimeout(this._refreshDaysNStocks.bind(this), delay)
             return 
         }        
-        let p1 = ccApi.backend.act.getDividDaysLeft(),
+        let p1 = mw.divid.getDividDaysLeft(),
             p2 = this.initSeckillActivity(mw.seckill.seckillDayNum)
         let [res1, res2] = await Promise.all([p1, p2])
         console.log('剩余天数: ' + res1.data.surplusDay)
@@ -284,98 +283,17 @@ var homePage = new ccView({
             els.eq(1).css('background-image', `url(${require('../../images/home/2labelyeartencent.png')})`)    
         }
     },
-    async autoCollectCoupon(data) { //进入活动时自动领取后台派发的优惠券
-        let pic = '', draw, collect;
-        if(data.entryType > 0) {
-            let ret = await ccApi.backend.act.actSetCrowd()
-            console.log('设置人群: ' + JSON.stringify(ret))
-            if(ret.code !== '50100') {
-                if(!this.autoCollectCoupon.first) {
-                    this.autoCollectCoupon.first = true
-                    this.autoCollectCoupon(data)
-                    return //重试一次
-                }
-                return //终止流程
-            }
-        }
-
-        if(data.overNum > 0) {
-            draw = await ccApi.backend.act.doLuckDraw(1)
-            console.log('自动领取优惠券 抽奖: ' + JSON.stringify(draw)) 
-            if(draw.code !== '50100') {
-                console.log('自动领取优惠券错误')
-                return
-            }
-            collect = await mw.myaward.showRewardDialog(draw.data, this, false)
-            console.log('领奖结果: ' + collect)
-            pic = draw.data.awardUrl
-        } else if(data.allUsedNumber > 0) {
-            this.data.hasCollectedDividend = true
-            pic = data.couponUrl   
-        }
-        
-        console.log(pic)
-        if(pic) {
-            let els = $('.vipbuyinfo.current-source')
-            els.children().css('background-image', `url(${pic})`)    
-        }
+    async autoCollectCoupon(data) { 
+        $(`${this.id} .left-day`).text(res.data.dayNum)
     },
-    async initDividTask() {
-        try {
-            let res = await ccApi.backend.act.initDividTask(),
-                ctx = this,
-                page_state = '加载成功',
-                activity_stage = '活动期间',
-                vipRes;
-            console.log('瓜分init: ' + JSON.stringify(res))
-            if(res.code === '50100') {
-                ccStore.setUserKeyId(res.data.userKeyId)
-                await this.autoCollectCoupon(res.data)
-                $(`${this.id} .left-day`).text(res.data.dayNum)
-                let awards = res.data.rememberEntities
-                if(awards) {
-                    while(!vipRes) {//bugfix 瓜分权益失败弹窗点刷新按钮后焦点丢失问题
-                        vipRes = await mw.myaward.showRewardDialog(awards, ctx)
-                    }
-                } 
-                if(res.data.isLate) {
-                    ccData.submitLogShow({
-                        page_name: '瓜分VIP会员弹窗-已瓜分完',
-                        page_type: 'inactivityWindows',
-                   })
-                    await ccDialog.show({
-                        title: '来晚了~<br>今日的影视VIP奖池已被瓜分完啦',
-                        icon: require('../../images/dialog/iconfail.png'),
-                        state: '已瓜分完',
-                        btnOK: '知道了',
-                        onOK: function() { 
-                            console.log('ok') 
-                            ccData.submitLogClick({
-                                page_name: '瓜分VIP会员弹窗-已瓜分完',
-                                page_type: 'inactivityWindows',
-                                button_name: '知道了-已瓜分完',
-                            })
-                        },
-                        onCancel: function() {
-                            console.log('cancel')
-                        },
-                        onComplete: function() { 
-                            console.log('complete')
-                            ctx.bindKeys()
-                        }
-                    }) 
-                }
-            }else if(res.code == '50003' || res.code === '50042') {
+    async initDividTask() { 
+        let res = await mw.divid.initDividTask()
+        if(res) {
+            if(res.resMsg === 'ok') {
+                $(`${this.id} .left-day`).text(res.dayNum)
+            } else if(res.resMsg === 'end') {
                 $(`${this.id} .left-day`).text(0).next().find('.center').children('.actEnd').last().remove()
-                ccStore.state.actStates = 'end'
-                activity_stage = '已结束';
-            }else {
-                page_state = '加载异常';
-                // throw new Error(res.code + res.msg)
             }
-            ccData.setActState({page_state, activity_stage})
-        } catch(e) {
-            ccToast.show('提示<br>' + e)
         }
     },
     _updateActEndUI() {
