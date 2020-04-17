@@ -78,7 +78,7 @@ class ccEvent {
             delta = top - (bH - elH) / 2;   //垂直居中显示
         // console.log(`el top: ${top}, elH: ${elH}, delta: ${delta}, container.scrollTop(): ${container.scrollTop()}`)
         if(delta) container[0].scrollTop += delta
-        //异步的带过度效果，但会影响我的奖品页面对scrollTop的同步使用
+        //异步的带过渡效果，但会影响我的奖品页面对scrollTop的同步使用
         //delta && container.animate({scrollTop: `${container.scrollTop() + delta}`}) 
         // console.log(`el ${JSON.stringify(this.getBoundingClientRect())}, container.scrollTop(): ${container.scrollTop()}`)
     }

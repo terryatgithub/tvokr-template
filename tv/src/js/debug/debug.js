@@ -1,5 +1,5 @@
 /**
- * PC debug 为PC上debug使用
+ * 为在PC上调试使用
  */
 var pcDebug = {
 	bindEvent(ctx) { //测试返回键（在PC上，用click模拟TV上的返回键）
