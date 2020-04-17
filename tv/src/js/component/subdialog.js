@@ -1,12 +1,15 @@
 /**
- * 二维码弹窗
- * 继承普通弹窗
+ * 对话框子弹窗，继承普通弹窗
+ * 作为其它弹窗的纯基类，不能被实例化
  */
 import dialog, {Dialog} from './dialog.js'
 
 class SubDialog extends Dialog {
         
     constructor(selector) {
+        if(new.target === SubDialog) {
+            throw new Error('SubDialog is an abstract class, can NOT be instanced.')
+        }
         super(selector)
     }
 

@@ -718,7 +718,7 @@ class DrawLuck {
                cardid = `卡号: ${res.data.cardInfo[0].cardNo}`
                cardpw = `密码: ${res.data.cardInfo[0].password}`               
           }
-          res = await ccCoupon.show({
+          res = await ccKami.show({
                title: '恭喜您获得' + item.awardName,
                cardid,
                cardpw,

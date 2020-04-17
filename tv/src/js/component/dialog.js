@@ -1,5 +1,5 @@
 import '../../css/dialog.scss'
-import ccEvent from '../handler/index.js';
+import ccEvent from '../eventhandler/index.js';
 
 /**
  * 对话框类（模态弹窗） 
@@ -69,7 +69,7 @@ class Dialog {
 			'common': ccDialog,
 			'qrcode': ccQrCode,
 			'entity-collected': ccEntityCollected,
-			'coupon': ccCoupon,
+			'kami': ccKami,
 		}
 		$('#dialog').children().each(function(){
 			if($(this).css('display') != 'none') {
@@ -87,10 +87,10 @@ class Dialog {
 	/**
 	 * 事件处理函数
 	 * this 是触发事件的DOM元素
-	 * e.data.ctx 是注册eventHandler时传递的调用环境上下文(this)
+	 * e.data.ctx 是注册onClick时传递的调用环境上下文(this)
 	 * @param {Event} e 
 	 */
-	eventHandler(e) {
+	onClick(e) {
 		let ctx = e.data.ctx
 		if ($(this).hasClass('dialog-confirm')) { //trigger OK button
 			ctx._param.onOK && ctx._param.onOK()
@@ -111,11 +111,11 @@ class Dialog {
 		//显示UI
 		this._render()
 		$('#dialog').show()
-		//初始化焦点，并注册eventHandler
+		//初始化焦点，并注册onClick
 		let btns = $(`${this.id} .coocaa_btn`),
 			defFocus = param.defFocus == 'cancel' ? '.dialog-cancel' : '.dialog-confirm'
 		ccMap.init(btns, btns.filter(defFocus), "btn-focus")
-		ccEvent.bindClick(btns, {ctx: this}, this.eventHandler)
+		ccEvent.bindClick(btns, {ctx: this}, this.onClick)
 	}
 	/**
 	 * 渲染UI，仅限内部使用

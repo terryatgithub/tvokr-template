@@ -1,7 +1,7 @@
 /**
  * 页面纯基类，不能被实例化,只能被继承
  */
-import ccEvent from '../handler/index.js'
+import ccEvent from '../eventhandler/index.js'
 
 class View {
 

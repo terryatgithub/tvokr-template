@@ -1,6 +1,7 @@
 /**
  * 本地mock模块
  * 目前mock模式用的是后台mock服务器，没有用该模块
+ * @todo 尚未完全用起来，待完善
  */
 import Mock from 'mockjs'
 

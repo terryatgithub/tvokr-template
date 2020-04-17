@@ -1,11 +1,11 @@
 /**
  * 卡密弹窗
- * 继承普通弹窗
+ * 继承子弹窗
  */
 import SubDialog from './subdialog.js'
-import '../../css/coupon.scss'
+import '../../css/kami.scss'
  
-class CouponDialog extends SubDialog {
+class KamiDialog extends SubDialog {
     
     constructor(selector) {
         super(selector)
@@ -26,5 +26,5 @@ class CouponDialog extends SubDialog {
     }
 }
 
-const coupon = new CouponDialog('#dialog .coupon')
-export default coupon
+const kami = new KamiDialog('#dialog .kami')
+export default kami

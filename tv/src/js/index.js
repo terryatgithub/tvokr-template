@@ -9,7 +9,7 @@ import _util from './util/index.js'
 import _data from './util/datacollect.js'
 import _dialog from './component/dialog.js'
 import _qrcode from './component/qrcode.js'
-import _coupon from './component/coupon.js'
+import _kami from './component/kami.js'
 import _entityCollected from './component/entitycollected.js'
 import _toast from './component/toast.js'
 import homePage from './views/home.js'
@@ -24,7 +24,7 @@ window.ccUtil = _util
 window.ccData = _data
 window.ccDialog = _dialog
 window.ccQrCode = _qrcode
-window.ccCoupon = _coupon
+window.ccKami = _kami
 window.ccEntityCollected = _entityCollected
 window.ccToast = _toast
 
