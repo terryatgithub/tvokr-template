@@ -1,19 +1,20 @@
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
 import router from '../router/route.js'
-import mw from '../middleware/middleware.js'
+import mw from '../middleware/index.js'
 import '../../css/seckill.scss'
 
-var seckillPage = new ccView({
-	name: 'seckill',
-	id: '#seckillPage',
-	data: {
-		title: 'seckillPage title',
-		tips: 'this is some text used to placeholding............'
-    },
+class SeckillPage extends ccView{
+    constructor(selector) {
+        super(selector)
+        this.name = 'seckill page'
+        this.data = {
+        }
+    }
+
     getBtns() {
         return (`${this.id} .coocaa_btn`)
-    },
+    }
     async clickEventHandler(e) {
         let type = $(this).attr('data-type');
         console.log(`hoseckillPageme clickEventHandler event target: ${event.target.id}`)
@@ -25,16 +26,16 @@ var seckillPage = new ccView({
                 button_name: '去参加活动'
             }) 
         } 
-    },
+    }
     async focusEventHandler(e) {
         // let ctx = e.data.ctx;
-    },
+    }
     bindKeys() {
         let btns = $(this.getBtns())
 		ccMap.init(btns, btns[0], "btn-focus")
         ccEvent.bindClick(btns, {ctx:this}, this.clickEventHandler)
         ccEvent.bindFocus(btns, {ctx:this}, this.focusEventHandler)
-    },
+    }
 	async created() {
 		console.log('--seckillPage created')
         $(this.id).show()
@@ -47,15 +48,15 @@ var seckillPage = new ccView({
         $('#seckillPageMyList').empty().html(empty)
         await this._getSecKillMyList()
         this.bindKeys()
-	},
+	}
 	destroyed() {
 		console.log('--seckillPage destroyed')
 		$(this.id).hide()
-    },
+    }
     async _getSecKillMyList() {  
         let res = await mw.seckill.getMySecKillList()
         res && this._updatePageInfo(res.data)
-    },
+    }
     _updatePageInfo(list) {
         if(!list || !list.length) { return }
         let header = `<ul>`,
@@ -77,6 +78,7 @@ var seckillPage = new ccView({
             }, '')
         $('#seckillPageMyList').empty().html(header + body + footer)
     }
-})
+}
 
+const seckillPage = new SeckillPage('#seckillPage')
 export default seckillPage

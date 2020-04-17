@@ -30,6 +30,7 @@ window.ccToast = _toast
 
 var ccMain = {
     _setActId() { //从url参数读取活动id
+        ccStore.setCcFrom(ccUtil.getUrlParam('ccfrom'))
         ccStore.setActiviyId(ccUtil.getUrlParam('gfid'), ccUtil.getUrlParam('cjid'))
         console.log('活动id:' + JSON.stringify(ccStore.state.actId)) 
     },

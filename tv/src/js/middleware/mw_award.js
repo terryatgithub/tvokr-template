@@ -747,7 +747,7 @@ class DrawLuck {
           return ret
      }
      /**
-      * 获取中奖消息，并自动滚动
+      * 获取中奖消息，并插入到ul元素里，自动滚动
       * @param {JQuery Object} ul 中奖消息滚动的父元素ul
       */
      async showLuckyNews(ul) {

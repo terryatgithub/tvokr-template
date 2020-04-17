@@ -6,55 +6,40 @@ import ccView from './view.js'
 import ccEvent from '../handler/index.js'
 import router from '../router/route.js'
 import '../../css/home.scss'
-import mw from '../middleware/middleware.js'
+import mw from '../middleware/index.js'
 
-var homePage = new ccView({
-	name: 'home',
-	id: '#homePage',
-	data: {
-        title: 'home page title',
-        tips: 'this is some text used to placeholding............',
-        curFocus: 0,
-        pageRefreshTimer: null, //页面刷新瓜分剩余天数和库存的timer
-    },
+class HomePage extends ccView{
+    constructor(selector) {
+        super(selector)
+        this.name = 'home page'
+        this.data = {
+            curFocus: 0,
+            pageRefreshTimer: null, //页面刷新瓜分剩余天数和库存的timer
+        }
+    }
+
     getBtns() {
         return `${this.id} .coocaa_btn`
-    },
-    _resetRefreshTimer() {
+    }
+
+    _resetAutoRefreshTimer() {
         // this.data.pageRefreshTimer && clearTimeout(this.data.pageRefreshTimer)
         // this.data.pageRefreshTimer = setTimeout(this._refreshDaysNStocks.bind(this), 30000)
-    },
+    }
+
+    /**
+     * onClick
+     * @param {Event} e 
+     */
     async clickEventHandler(e) {
         let ctx = e.data.ctx,
-            id = $(this).attr('id'),
-            res = '',focus;
+            id = $(this).attr('id');
         console.log(`home clickEventHandler event target: ${id}`)
-        ctx._resetRefreshTimer()
-        if(!id) {//如果没有id
-            let type = $(this).attr('data-type'),button_name, button_state;
-            console.log(`home clickEventHandler event target type: ${type}`)
-            switch(type) {
-                case 'vipmovie':
-                case 'vipall':
-                    button_name =  $(this).attr('data-log')
-                    ccData.submitLogClick({
-                        page_name: '活动主页面',
-                        activity_stage: ccData.activity_stage,
-                        button_name,
-                        button_state: ccStore.state.luckDrawInfo.belongVip 
-                    })
-                    ctx._goVipBuyPage(type)
-                    break;
-                case 'seckillitem':
-                    mw.seckill.goSeckillPage($(this))
-                    break;
-            }
-            return
-        }
+        ctx._resetAutoRefreshTimer()
         switch(id){
             case 'goAwardPage':
                 if(!ccStore.state.hasLogin) {
-                    ctx._goLogin()
+                    mw.common.goLogin()
                     return 
                 }
                 ccData.submitLogClick({
@@ -74,7 +59,7 @@ var homePage = new ccView({
                 break;     
             case 'goSeckillPage':
                 if(!ccStore.state.hasLogin) {
-                    ctx._goLogin()
+                    mw.common.goLogin()
                     return 
                 }
                 router.push('seckill')
@@ -94,9 +79,34 @@ var homePage = new ccView({
                     button_name: '回到顶部'
                 })  
                 ctx._initFocusWhenFirstIn(false)
-               break;              
+               break;     
+            default: //如果元素没有id
+                {
+                    let type = $(this).attr('data-type');
+                    console.log(`home clickEventHandler event target type: ${type}`)
+                    switch(type) {
+                        case 'vipmovie':
+                        case 'vipall':
+                            ccData.submitLogClick({
+                                page_name: '活动主页面',
+                                activity_stage: ccData.activity_stage,
+                                button_name:  $(this).attr('data-log'),
+                                button_state: ccStore.state.luckDrawInfo.belongVip 
+                            })
+                            ctx._goVipBuyPage(type)
+                            break;
+                        case 'seckillitem':
+                            mw.seckill.goSeckillPage($(this))
+                            break;
+                    }
+                    return
+                }
         }
-    },
+    }
+    /**
+     * onFocus
+     * @param {Event} e 
+     */
     async focusEventHandler(e) {
         let ctx = e.data.ctx,
             id = $(this).attr('id'),
@@ -122,10 +132,9 @@ var homePage = new ccView({
             logdata = '第一屏'
         }
         if(logdata) {
-            let ccfrom = ccUtil.getUrlParam('ccfrom'),
-                source_page = 'movie';
-            if(ccfrom) {
-                source_page = ccfrom
+            let source_page = 'movie';
+            if(ccStore.state.ccfrom) {
+                source_page = ccStore.state.ccfrom
             }
             ccData.submitLogShow({
                 page_name: '活动主页面',
@@ -135,45 +144,62 @@ var homePage = new ccView({
                 split_screen: logdata
             })
         }
-    },
+    }
+    /**
+     * bind()
+     */
     bindKeys() {
         let btns = $(this.getBtns())
         ccMap.init(btns, $(btns[this.data.curFocus]), "btn-focus")
         ccEvent.bindClick(btns, {ctx:this}, this.clickEventHandler)
         ccEvent.bindFocus(btns, {ctx:this}, this.focusEventHandler)
-    },
+    }
+    /**
+     * unbind()
+     */
     unbindKeys() {
         ccMap.init('', '', "")
         ccEvent.unbindAllKeys($(this.getBtns()))
-    },
+    }
+    /**
+     * 复位焦点到指定元素
+     * @param {Object} focus: $(selector) 
+     */
     _resetFocus(focus) {
-        let btns = $(this.getBtns()), f;
+        let btns = $(this.getBtns()), 
+            f;
         if(focus) {
             this.data.curFocus = $(this.getBtns()).index(focus);
         } 
         f = focus || $(btns[this.data.curFocus])
         ccMap.init(btns, f, "btn-focus")
         f.trigger('itemFocus')
-    },
+    }
+    /**
+     * 首次进入活动首页时的默认落焦
+     * @param {Boolean} bFirstIn 
+     */
     _initFocusWhenFirstIn(bFirstIn=true) {
-        let focus, ccfrom = ccUtil.getUrlParam('ccfrom');
+        let focus;
         if(bFirstIn && ccUtil.getUrlParam('ccport') === 'xiaojiayuan') {
             focus = $('#homeSeckillItemList .coocaa_btn:first')
         } else {
-            if(ccfrom) {
+            if(ccStore.state.ccfrom) {
                 focus = $('#homeGoLuckDraw')
             } else {
                 focus = $('[data-type="vipmovie"]').eq(0)
             }
         }
         this._resetFocus(focus)
-    },
-    _resetInitFocus() { //从外部进入首页时，重置初次进入的焦点
-        console.log('resetInitFocus... in')
-        if(this._resetInitFocus.inited) return;
-        console.log('resetInitFocus...in true')
-        let ccfrom = ccUtil.getUrlParam('ccfrom');
-        if(ccfrom) {
+    }
+    /**
+     * 首次进入活动首页的UI流程处理
+     * 只在首次进入时执行一次
+     */
+    _updateUIWhenFirstIn() {
+        console.log(`resetInitFocus... ${this._updateUIWhenFirstIn.inited}`)
+        if(this._updateUIWhenFirstIn.inited) return;
+        if(ccStore.state.ccfrom) {
             $('.second-zone').remove()
             $('.privilege-list').attr('src', `${require('../../images/home/1previlege3.png')}`)
             $('#goAwardPage').attr('downTarget', '#homeGoLuckDraw')
@@ -183,20 +209,20 @@ var homePage = new ccView({
         if(ccStore.state.actStates !== 'end') {
             this._initFocusWhenFirstIn()
         } 
-        let source_page = 'movie';
-        if(ccfrom) {
-            source_page = ccfrom
-        }
         ccData.submitLogShow({
             page_name: '活动主页面',
             page_state: ccData.page_state,
             load_duration: ccUtil.getNowTimeSecond() - ccData.timePageStart,
             activity_stage: ccData.activity_stage,
-            source_page
+            source_page: ccStore.state.ccfrom || 'movie'
         })
-        this._resetInitFocus.inited = true
-    },
-    _handlePathParam(str) { //页面内部跳转时用参数判断
+        this._updateUIWhenFirstIn.inited = true
+    }
+    /**
+     * 处理从其它页面跳转到首页指定位置
+     * @param {String} str 路由参数
+     */
+    _handlePathParam(str) { 
         if(!str) return 
         str = str.split('&')
         str.find(item => {
@@ -214,39 +240,35 @@ var homePage = new ccView({
                 return true
             }
         })
-    },
+    }
+    
 	async created(str) {
-        console.log('--home created: ', ccStore.getters.commonParam())
+        console.log('home created')
         $(this.id).show()
-        this._updateUIMsg()
-        this.refreshQrCode()
+        this._updateUI()
+        this._refreshQrCode()
         this._getLuckyNews()
         await this.initDividTask()
         await this.initDrawTask()
-        if(ccStore.state.actStates === 'end') {
-            this._updateActEndUI()
-        }
         await this.initSeckillActivity()
-        if(ccStore.state.actStates === 'end' || ccStore.state.luckDrawInfo.startDayNum >= 10) { //活动结束
-            $('#seckillShowTmrItems').remove()
-        }
+        this._updateUIWhenActEnd()
         this.bindKeys()
-        this._resetInitFocus()
+        this._updateUIWhenFirstIn()
         this._handlePathParam(str)
-        this._resetRefreshTimer()
-    },
+        this._resetAutoRefreshTimer()
+    }
     //todo 评估必要性:
     //优化成 created() 和 mounted() created()里先加载html  mounted里放请求逻辑，以加快首屏显示
     mounted() {
         console.log('--home mounted')
         
-    },
+    }
 	destroyed() {
         console.log('--home destroyed')
         mw.seckill.disableTimeout()
         this.data.pageRefreshTimer && clearTimeout(this.data.pageRefreshTimer)
 		$(this.id).hide()
-    },
+    }
     async _refreshDaysNStocks() { //刷新剩余天数和库存数
         let delay = 15000
         console.log(`_refreshDaysNStocks... every ${delay}s`)
@@ -263,8 +285,8 @@ var homePage = new ccView({
             $(`${this.id} .left-day`).text(res1.data.surplusDay)
         }
         this.data.pageRefreshTimer = setTimeout(this._refreshDaysNStocks.bind(this), delay)
-    },
-    _updateUIMsg() {
+    }
+    _updateUI() {
         console.log('source: ' + ccStore.state.source)
         if(ccStore.state.source === 'tencent') {
             $('.vipbuyinfo').eq(0).removeClass('current-source')
@@ -278,7 +300,7 @@ var homePage = new ccView({
             els.eq(0).css('background-image', `url(${require('../../images/home/2labelseasontencent.png')})`)
             els.eq(1).css('background-image', `url(${require('../../images/home/2labelyeartencent.png')})`)    
         }
-    },
+    }
     async initDividTask() { 
         let res = await mw.divid.initDividTask()
         if(res) {
@@ -288,19 +310,22 @@ var homePage = new ccView({
                 $(`${this.id} .left-day`).text(0).next().find('.center').children('.actEnd').last().remove()
             }
         }
-    },
-    _updateActEndUI() {
-        $(`${this.id} .draw-num`).next().find('.center').children('.actEnd').last().remove()
-        $('#homeGoLuckDraw').css('background-image', `url(${require('../../images/draw/btnend.png')})`)
-    },
+    }
+    _updateUIWhenActEnd() {
+        if(ccStore.state.actStates === 'end' || ccStore.state.luckDrawInfo.startDayNum >= 10) { //活动结束
+            $('#seckillShowTmrItems').remove()
+            $(`${this.id} .draw-num`).next().find('.center').children('.actEnd').last().remove()
+            $('#homeGoLuckDraw').css('background-image', `url(${require('../../images/draw/btnend.png')})`)
+        }
+    }
     async initDrawTask() { 
         if(!ccStore.state.hasLogin) return  //未登录不能初始化抽奖
         let res = await mw.myaward.initDrawTask()
         if(res.resMsg) {
             $(`${this.id}`).find('.draw-num').text('X' + res.overNum)
         }
-    },
-    async refreshQrCode() {
+    }
+    async _refreshQrCode() {
         let p1 = ccApi.backend.wx.getTmpQrcode(1),
             p2 = ccApi.backend.wx.getTmpQrcode(2),
             url1 = ccApi.backend.wx.getDefaultUrl(),
@@ -316,19 +341,19 @@ var homePage = new ccView({
             id: 'qrGoMobSeckillPage',
             url: url2
         })                                                           
-    },
+    }
     async _getLuckyNews() {
         let ul = $('#homeLuckyNewsList')
         await mw.myaward.showLuckyNews(ul)
-    },
+    }
     async initSeckillActivity(day=0) {
         let res = await mw.seckill.initSeckillItems(day)
-        res && this.bindKeys()
-    },
+        res && this.bindKeys() //更新秒杀商品列表后需要重新绑定，因为目前的做法会更新元素
+    }
     _goVipBuyPage(type) {
-        let info = ccStore.state.luckDrawInfo, idx, ccfrom = ccUtil.getUrlParam('ccfrom');
-        if(type === 'vipall' && ccfrom) {
-            idx = ccUtil.getUrlParam('ccfrom')
+        let info = ccStore.state.luckDrawInfo, idx;
+        if(type === 'vipall' && ccStore.state.ccfrom) {
+            idx = ccStore.state.ccfrom
         } else {
             if(type === 'vipall') {
                 switch(info.vipType) {
@@ -346,7 +371,7 @@ var homePage = new ccView({
         console.log('startMovieMemberCenter: ' + idx)
         ccStore.state.goVipBuyPage = true
         ccApi.tv.startMovieMemberCenter({sourceId: (info.vipSourceId[idx]).toString()})        
-    },
+    }
     async _drawLuck() { 
         this.unbindKeys()
         $('#homeGoLuckDraw').removeClass('btn-focus')
@@ -356,8 +381,9 @@ var homePage = new ccView({
         }
         this.bindKeys()
 
-    },
+    }
 
-})
+}
 
+const homePage = new HomePage('#homePage')
 export default homePage

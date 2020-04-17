@@ -32,7 +32,8 @@ var store = {
         goVipBuyPage: false,
         goLoginPage: false,
         homepageVersion: 0,
-        userKeyId: ''
+        userKeyId: '',
+        ccfrom: '',//进入活动的来源, edu/kid/game
     },
     getters: {
         commonParam() {
@@ -100,6 +101,10 @@ var store = {
     setUserKeyId(value) {
         if(this.debug) console.log(`ccStore set userKeyId: ${JSON.stringify(value)}`)
         this.state.userKeyId = value
+    },
+    setCcFrom(value) {
+        if(this.debug) console.log(`ccStore set ccfrom: ${JSON.stringify(value)}`)
+        this.state.ccfrom = value || ''
     },
     printAllState() { //debug only
         Object.entries(this.state).forEach(item => console.log(item))

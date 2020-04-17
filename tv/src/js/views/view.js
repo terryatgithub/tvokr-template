@@ -1,29 +1,49 @@
+/**
+ * 页面基类，不能被实例化
+ */
+
 class View {
-	constructor(param) {
-		this.param = param
-		this.id = this.param.id
+	constructor(selector) {
+		if(new.target === View) {
+			throw new Error('View is an abstract class, can NOT be instanced.')
+		}
+		this.id = selector
 	}
+		
 	async init(str) {
-		let param = this.param 
-		console.log(`init, page name:${param.name}`)
-		param.created && await param.created(str)
+		console.log(`init, page name:${this.name}`)
+		this.created && await this.created(str)
 	}
+	
 	uninit() {
-		let param = this.param 
-		console.log(`deinit, page name:${param.name}`)
-		param.destroyed && param.destroyed()
+		console.log(`deinit, page name:${this.name}`)
+		this.destroyed && this.destroyed()
 	}
+
 	isShow() {
 		return ccUtil.isShow.apply(this)
 	}
+
 	rebindKeys() {
-		let param = this.param
-		param.bindKeys && param.bindKeys()
+		this.bindKeys && this.bindKeys()
 	}
+	
 	refreshPage() {
-		let param = this.param
-		param.refreshPage && param.refreshPage()
+		this.refreshPage && this.refreshPage()
 	}
+	/**
+	 * 生命周期函数 created
+	 * @param {*} param 
+	 */
+	created(param) {
+
+	}
+
+	destroyed() {
+
+	}
+
+
 }
 
 export default View
