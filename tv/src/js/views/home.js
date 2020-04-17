@@ -4,7 +4,7 @@
  */
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
-import router from '../router/route.js'
+import router from '../router/index.js'
 import '../../css/home.scss'
 import mw from '../middleware/index.js'
 

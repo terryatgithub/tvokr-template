@@ -1,6 +1,6 @@
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
-import router from '../router/route.js'
+import router from '../router/index.js'
 import '../../css/rules.scss'
 
 class RulePage extends ccView {

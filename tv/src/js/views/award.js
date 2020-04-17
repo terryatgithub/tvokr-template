@@ -1,6 +1,6 @@
 import ccView from './view.js'
 import ccEvent from '../handler/index.js'
-import router from '../router/route.js'
+import router from '../router/index.js'
 import '../../css/award.scss'
 import mw from '../middleware/index.js'
 
@@ -22,7 +22,7 @@ class AwardPage extends ccView{
     getBtns() {
         return (`${this.id} .coocaa_btn`)
     }
-    
+
     async clickEventHandler(e) {
         let ctx = e.data.ctx,
             type = $(this).attr('data-type');

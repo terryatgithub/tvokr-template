@@ -1,7 +1,7 @@
 import '../css/common.css'
 import '../css/index.scss'
 import ccMap from '@ccos/ccmap'
-import router from './router/route.js'
+import router from './router/index.js'
 import store from './store/store.js'
 import api from './api/api.js'
 import pcDebug from './debug/debug.js'
