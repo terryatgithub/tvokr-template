@@ -1,7 +1,7 @@
 /**
  * 后台接口 url 配置
  */
-import store from '../../store/store.js'
+import store from '../../store/index.js'
 
 let baseUrl = '/api', //本地代理
     actUrl,  //活动url
