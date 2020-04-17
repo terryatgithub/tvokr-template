@@ -3,7 +3,6 @@
  * 处理跟页面交互相关的逻辑
  */
 import ccView from './view.js'
-import ccEvent from '../handler/index.js'
 import router from '../router/index.js'
 import '../../css/home.scss'
 import mw from '../middleware/index.js'
@@ -135,7 +134,7 @@ class HomePage extends ccView{
                 }
         }
     }
-    
+
     /**
      * onFocus
      * @param {Event} e 
@@ -174,25 +173,7 @@ class HomePage extends ccView{
             })
         }
     }
-    
-    /**
-     * 绑定当前页面按钮
-     */
-    bindKeys() {
-        let btns = $(this.coocaaBtns)
-        ccMap.init(btns, $(btns[this.curFocus]), "btn-focus")
-        ccEvent.bindClick(btns, {ctx:this}, this.onClick)
-        ccEvent.bindFocus(btns, {ctx:this}, this.onFocus)
-    }
 
-    /**
-     * 解绑按钮
-     */
-    _unbindKeys() {
-        ccMap.init('', '', "")
-        ccEvent.unbindAllKeys($(this.coocaaBtns))
-    }
-    
     /**
      * 设置焦点到指定元素
      * @param {Object} focus: $(selector) 
@@ -233,7 +214,7 @@ class HomePage extends ccView{
     _updateUIWhenFirstIn() {
         console.log(`resetInitFocus... ${this._updateUIWhenFirstIn.inited}`)
         if(this._updateUIWhenFirstIn.inited) return;
-        if(ccStore.state.ccfrom) {
+        if(ccStore.state.ccfrom !== 'movie') {
             $('.second-zone').remove()
             $('.privilege-list').attr('src', `${require('../../images/home/1previlege3.png')}`)
             $('#goAwardPage').attr('downTarget', '#homeGoLuckDraw')

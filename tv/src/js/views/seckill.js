@@ -1,5 +1,4 @@
 import ccView from './view.js'
-import ccEvent from '../handler/index.js'
 import router from '../router/index.js'
 import mw from '../middleware/index.js'
 import '../../css/seckill.scss'
@@ -63,16 +62,6 @@ class SeckillPage extends ccView{
      */
     async onFocus(e) {
         // let ctx = e.data.ctx;
-    }
-
-    /**
-     * 绑定当前页面按钮
-    */
-    bindKeys() {
-        let btns = $(this.coocaaBtns)
-		ccMap.init(btns, btns[0], "btn-focus")
-        ccEvent.bindClick(btns, {ctx:this}, this.onClick)
-        ccEvent.bindFocus(btns, {ctx:this}, this.onFocus)
     }
 
     /**

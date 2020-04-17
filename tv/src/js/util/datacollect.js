@@ -3,10 +3,6 @@
  * 在原子api基础上，封装页面共同的业务逻辑层
  */
 import common from './common.js'
-// import './cm.js'
- /**
- * 数据采集
- */
 // function submitLog({ category = '', action = '', label = '' } = {}) {
 //      window._czc.push(['_trackEvent', category, action, label, '', ''])
 //      window._cooc.push(['_trackEvent', 'okr_20200418_会员日TV', '', {

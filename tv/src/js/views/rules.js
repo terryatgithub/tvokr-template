@@ -1,5 +1,4 @@
 import ccView from './view.js'
-import ccEvent from '../handler/index.js'
 import '../../css/rules.scss'
 
 class RulePage extends ccView {
@@ -42,12 +41,11 @@ class RulePage extends ccView {
     }
 
     /**
-     * 绑定当前页面按钮
-    */
-    bindKeys() {
-        let btns = $(this.coocaaBtns)
-        ccMap.init(btns, btns[0], "btn-focus")
-        ccEvent.bindClick(btns, {ctx:this}, this.onClick)
+     * onFocus
+     * @param {Event} e 
+     */
+    async onFocus(e) {
+        // let ctx = e.data.ctx;
     }
 
 }

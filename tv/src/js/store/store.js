@@ -104,7 +104,7 @@ var store = {
     },
     setCcFrom(value) {
         if(this.debug) console.log(`ccStore set ccfrom: ${JSON.stringify(value)}`)
-        this.state.ccfrom = value || ''
+        this.state.ccfrom = value || 'movie'
     },
     printAllState() { //debug only
         Object.entries(this.state).forEach(item => console.log(item))

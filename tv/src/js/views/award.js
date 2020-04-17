@@ -1,5 +1,4 @@
 import ccView from './view.js'
-import ccEvent from '../handler/index.js'
 import router from '../router/index.js'
 import '../../css/award.scss'
 import mw from '../middleware/index.js'
@@ -97,16 +96,6 @@ class AwardPage extends ccView{
             ctx._changeTab($(this).attr('data-id'))
             return
         }
-    }
-
-    /**
-     * 绑定当前页面按钮
-     */
-    bindKeys() {
-        let btns = $(this.coocaaBtns)
-        ccMap.init(btns, btns[this.curFocus], "btn-focus")
-        ccEvent.bindClick(btns, {ctx:this}, this.onClick)
-        ccEvent.bindFocus(btns, {ctx:this}, this.onFocus)
     }
 
     /**
