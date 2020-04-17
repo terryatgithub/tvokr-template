@@ -109,7 +109,7 @@ var ccMain = {
             },
             onCancel: function() {
                 console.log('cancel')
-                homePage.rebindKeys()
+                homePage.bindKeys()
             }
         })
     },
@@ -119,7 +119,7 @@ var ccMain = {
                 case homePage.isShow():
                     if(dlgShow) {
                         dlgShow.hide()
-                        homePage.rebindKeys()
+                        homePage.bindKeys()
                     } else {
                         ccData.submitLogClick({
                             page_name: '活动主页面',
@@ -137,7 +137,7 @@ var ccMain = {
                 case awardPage.isShow(): 
                     if(dlgShow) {
                         dlgShow.hide()
-                        awardPage.rebindKeys()
+                        awardPage.bindKeys()
                     } else {
                         router.push('home')
                     }
@@ -145,7 +145,7 @@ var ccMain = {
                 case rulesPage.isShow(): 
                     if(dlgShow) {
                         dlgShow.hide()
-                        rulesPage.rebindKeys()
+                        rulesPage.bindKeys()
                     } else {
                         router.push('home')
                     }
@@ -153,7 +153,7 @@ var ccMain = {
                 case seckillPage.isShow(): 
                     if(dlgShow) {
                         dlgShow.hide()
-                        seckillPage.rebindKeys()
+                        seckillPage.bindKeys()
                     } else {
                         router.push('home')
                     }
@@ -192,7 +192,7 @@ var ccMain = {
                     },
                     onComplete: function() { 
                         console.log('complete')
-                        homePage.rebindKeys()
+                        homePage.bindKeys()
                     }
                 })
             } else { //参与失败
@@ -218,7 +218,7 @@ var ccMain = {
                     },
                     onComplete: function() { 
                         console.log('complete')
-                        homePage.rebindKeys()
+                        homePage.bindKeys()
                     }
                 }) 
            }

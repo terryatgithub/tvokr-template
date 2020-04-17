@@ -5,11 +5,11 @@ import '../../css/award.scss'
 import mw from '../middleware/index.js'
 
 class AwardPage extends ccView{
+
     constructor(selector) {
         super(selector)
         this.name = 'award page'
         this.data = {
-            curFocus: 0,
             awardsMap: {   //所有奖品信息
                 curIndex: -1,
                 content: '',
@@ -18,19 +18,41 @@ class AwardPage extends ccView{
             } 
         }
     }
- 
-    getBtns() {
-        return (`${this.id} .coocaa_btn`)
-    }
 
-    async clickEventHandler(e) {
+    /**
+     * 生命周期函数 created 
+     * 首次进入页面调用
+     */
+	async created() {
+		console.log('--awardPage created')
+        $(this.id).show()
+        this.bindKeys()
+        await this._showMyAward()
+    }
+    
+    /**
+     * 生命周期函数 destroyed 
+     * 退出页面时调用
+     */
+    destroyed() {
+        console.log('--awardPage destroyed')
+        //焦点复位
+        this.curFocus = 0
+        $(`${this.id} .scroll-wrapper`).scrollTop(0)
+        this._resetFocus()
+        $(this.id).hide()
+    }
+    
+    /**
+     * 点击事件回调函数
+     * @param {Event} e 
+     */
+    async onClick(e) {
         let ctx = e.data.ctx,
             type = $(this).attr('data-type');
-
         if(type === 'tab') return
-        
-        console.log(`awardPage clickEventHandler event target: ${e.target.id}`)
-        ctx.data.curFocus = $(this).index(ctx.getBtns())
+        console.log(`awardPage onClick event target: ${e.target.id}`)
+        ctx.curFocus = $(this).index(ctx.coocaaBtns)
         let index = $(this).attr('data-index');
         if(!index) { //去参与活动按钮
             let cur = ctx.data.awardsMap.curIndex
@@ -40,7 +62,7 @@ class AwardPage extends ccView{
                 activity_stage: ccData.activity_stage,
                 button_name: '去参加活动'
             }) 
-            if(cur && !ccStore.state.ccfrom){
+            if(cur && ccStore.state.ccfrom === 'movie'){
                 router.push('home?focus=divide')
             } else {
                 router.push('home?focus=draw')
@@ -55,19 +77,42 @@ class AwardPage extends ccView{
             prize_name: curAwardInfo.awardName
         }) 
         let res = await mw.myaward.showRewardDialog(curAwardInfo, ctx)
-        if(res) { //res为true时领取完后查询状态变化（实体奖/优惠券/红包..)
+        //res为true时领取完后刷新奖品状态（实体奖/优惠券/红包..)
+        if(res) { 
           await ctx.refreshPage()
         }
     }
-    async refreshPage() {
-        console.log('awardpage refreshing.... start ')
-        ccToast.show('提示<br>页面刷新中，请稍候~', 10000)  
-        let focus = this.data.awardsMap.curIndex
-        await this._getMyReward(false)
-        this._changeTab(focus)
-        ccToast.hide()
-        console.log('awardpage refreshing.... end ')
+
+    /**
+     * onFocus
+     * @param {Event} e 
+     */
+    async onFocus(e) {
+        let ctx = e.data.ctx,
+            type = $(this).attr('data-type')
+        console.log(`awardPage onFocus event target: ${e.target.id}`)
+        ctx.curFocus = $(this).index(ctx.coocaaBtns)
+        ctx._toggleHeaderFocus()
+        if(type === 'tab') { 
+            ctx._changeTab($(this).attr('data-id'))
+            return
+        }
     }
+
+    /**
+     * 绑定当前页面按钮
+     */
+    bindKeys() {
+        let btns = $(this.coocaaBtns)
+        ccMap.init(btns, btns[this.curFocus], "btn-focus")
+        ccEvent.bindClick(btns, {ctx:this}, this.onClick)
+        ccEvent.bindFocus(btns, {ctx:this}, this.onFocus)
+    }
+
+    /**
+     * 往下翻页时，禁止奖品标题tab键获得焦点
+     * 以免往上滚动时焦点乱跑
+     */
     _toggleHeaderFocus() {
         let scrollTop = $(`${this.id} .scroll-wrapper`).scrollTop()
         if(scrollTop > 10) { //根据页面布局隐藏tab标签，否则焦点会乱
@@ -78,30 +123,18 @@ class AwardPage extends ccView{
             $(`${this.id} .header`).children().not('.coocaa_btn').hide()
         }
     }
-    async FocusEventHandler(e) {
-        let ctx = e.data.ctx,
-            type = $(this).attr('data-type')
-        console.log(`awardPage FocusEventHandler event target: ${e.target.id}`)
-        ctx.data.curFocus = $(this).index(ctx.getBtns())
-        ctx._toggleHeaderFocus()
-        if(type === 'tab') { 
-            ctx._changeTab($(this).attr('data-id'))
-            return
-        }
-    }
-    bindKeys() {
-        let btns = $(this.getBtns())
-        ccMap.init(btns, btns[this.data.curFocus], "btn-focus")
-        ccEvent.bindClick(btns, {ctx:this}, this.clickEventHandler)
-        ccEvent.bindFocus(btns, {ctx:this}, this.FocusEventHandler)
-    }
+    
+    /**
+     * 切换标题tab,显示对应标题的内容（我的奖品/我的权益)
+     * @param {Number} tab 
+     */
     _changeTab(tab = 0) {
         if(this.data.awardsMap.curIndex == tab) { return } 
         let children = $('#awardPage .header').children()
         children.removeClass('highlight')
         children.filter(function(index){
                 return index % 2 == tab
-            }).addClass('highlight')
+        }).addClass('highlight')
         if (tab == 0) {
             $('#awardWrapperId').empty().html(this.data.awardsMap.content)
             $('#privilegeWrapperId').empty()
@@ -119,11 +152,35 @@ class AwardPage extends ccView{
         this.data.awardsMap.curIndex = tab
         this.bindKeys()
     }
-    async _getMyReward(bindKey=true) {
-        let res = await mw.myaward.getMyReward()
-        this._updatePage(res, bindKey)
+
+    /**
+     * 刷新页面奖品状态
+     */
+    async refreshPage() {
+        console.log('awardpage refreshing.... start ')
+        ccToast.show('提示<br>页面刷新中，请稍候~', 10000)  
+        let focus = this.data.awardsMap.curIndex
+        await this._showMyAward(false)
+        this._changeTab(focus)
+        ccToast.hide()
+        console.log('awardpage refreshing.... end ')
     }
-    _updatePage(res, bindKey=true) { //更新页面奖品信息
+
+    /**
+     * 显示我的奖品
+     * @param {Boolean} bindKey 
+     */
+    async _showMyAward(bindKey=true) {
+        let res = await mw.myaward.getMyReward()
+        this._renderAllAward(res, bindKey)
+    }
+
+    /**
+     * 渲染所有奖品信息到页面（包括我的奖品和瓜分VIP权益）
+     * @param {Array[Object]} res 奖品列表 
+     * @param {*} bindKey 是否重新绑定按键
+     */
+    _renderAllAward(res, bindKey=true) {   
         let content = '',//奖品信息
             privilege = '', //vip权益信息
             isEnd = ccStore.state.actStates === 'end',
@@ -139,9 +196,9 @@ class AwardPage extends ccView{
                             </div>`;
         res && res.forEach((value, key) => {
             if (key === 'vip') {
-                privilege += this._updatePrivilegeInfo(value, key)
+                privilege += this._renderMyPrivilege(value, key)
             } else {
-                content += this._updateAwardInfo(value, key)
+                content += this._renderMyAward(value, key)
             }
         })
         this.data.awardsMap = {
@@ -159,7 +216,13 @@ class AwardPage extends ccView{
             })       
         }
     }
-    _updatePrivilegeInfo(value, key) { //更新权益页面
+
+    /**
+     * 渲染我的权益
+     * @param {Array[Object]} value 某类权益列表 
+     * @param {String} key 奖品类型 
+     */
+    _renderMyPrivilege(value, key) { 
         let header = `<ul>`,
             body = '',
             footer = `</ul>`;
@@ -176,7 +239,13 @@ class AwardPage extends ccView{
         }, '')
         return header + body + footer
     }
-    _updateAwardInfo(value, key) { //更新奖品页面
+
+    /**
+     * 渲染我的奖品
+     * @param {Array[Object]} value 某类奖品列表 
+     * @param {String} key 奖品类型 
+     */
+    _renderMyAward(value, key) { //更新奖品页面
         let header = `<div class="content"> 
                         <div class="sidebar"><div class="center">${mw.myaward.getChineseNameByType(key)}</div></div>
                         <ul class="list-wrapper">`,
@@ -217,28 +286,17 @@ class AwardPage extends ccView{
         }, '')
         return header + body + foot
     }
-	async created() {
-		console.log('--awardPage created')
-        $(this.id).show()
-        this.bindKeys()
-        await this._getMyReward()
-    }
+
     _resetFocus(focus) {
-        let btns = $(this.getBtns()), f;
+        let btns = $(this.coocaaBtns), f;
         if(focus) {
-            this.data.curFocus = $(this.getBtns()).index(focus);
+            this.curFocus = $(this.coocaaBtns).index(focus);
         } 
-        f = focus || $(btns[this.data.curFocus])
+        f = focus || $(btns[this.curFocus])
         ccMap.init(btns, f, "btn-focus")
         f.trigger('itemFocus')
     }
-	destroyed() {
-		console.log('--awardPage destroyed')
-        this.data.curFocus = 0
-        $(`${this.id} .scroll-wrapper`).scrollTop(0)
-        this._resetFocus()
-        $(this.id).hide()
-	}
+
 }
 
 const awardPage = new AwardPage('#awardPage')

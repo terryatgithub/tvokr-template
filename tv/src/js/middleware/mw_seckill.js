@@ -39,7 +39,7 @@ class SeckillMiddleware {
                }, [])
           this._seckillItemsUpdate(products)
           this.seckillGoodsInfo = products
-          this.disableTimeout()
+          this.disableCountdownTimer()
           this._seckillItemsCountdown()
           return true
       }
@@ -309,7 +309,7 @@ class SeckillMiddleware {
      /**
       * 停止秒杀商品倒计时刷新
       */
-     disableTimeout() {
+     disableCountdownTimer() {
           this.seckillTimer && clearTimeout(this.seckillTimer)
      }
 

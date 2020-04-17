@@ -33,7 +33,7 @@ var store = {
         goLoginPage: false,
         homepageVersion: 0,
         userKeyId: '',
-        ccfrom: '',//进入活动的来源, edu/kid/game
+        ccfrom: 'movie',//进入活动的来源, 默认影视，可在url后配置：ccfrom=edu/kid/game
     },
     getters: {
         commonParam() {

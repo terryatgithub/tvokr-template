@@ -5,6 +5,7 @@ import mw from '../middleware/index.js'
 import '../../css/seckill.scss'
 
 class SeckillPage extends ccView{
+    
     constructor(selector) {
         super(selector)
         this.name = 'seckill page'
@@ -12,31 +13,11 @@ class SeckillPage extends ccView{
         }
     }
 
-    getBtns() {
-        return (`${this.id} .coocaa_btn`)
-    }
-    async clickEventHandler(e) {
-        let type = $(this).attr('data-type');
-        console.log(`hoseckillPageme clickEventHandler event target: ${event.target.id}`)
-        if(type !== 'goods') { //去参与活动按钮
-            router.push('home?focus=seckill')
-            ccData.submitLogClick({
-                page_name: '我的秒杀页',
-                activity_stage: ccData.activity_stage,
-                button_name: '去参加活动'
-            }) 
-        } 
-    }
-    async focusEventHandler(e) {
-        // let ctx = e.data.ctx;
-    }
-    bindKeys() {
-        let btns = $(this.getBtns())
-		ccMap.init(btns, btns[0], "btn-focus")
-        ccEvent.bindClick(btns, {ctx:this}, this.clickEventHandler)
-        ccEvent.bindFocus(btns, {ctx:this}, this.focusEventHandler)
-    }
-	async created() {
+     /**
+     * 生命周期函数 created 
+     * 首次进入页面调用
+     */
+    async created() {
 		console.log('--seckillPage created')
         $(this.id).show()
         let isEnd = ccStore.state.actStates === 'end',
@@ -46,18 +27,67 @@ class SeckillPage extends ccView{
                         ${ isEnd ? '' : '<div class="coocaa_btn btn"></div>'}
                     </div>`
         $('#seckillPageMyList').empty().html(empty)
-        await this._getSecKillMyList()
+        await this._showMySeckillGoods()
         this.bindKeys()
-	}
+    }
+    
+    /**
+     * 生命周期函数 destroyed 
+     * 退出页面时调用
+     */
 	destroyed() {
 		console.log('--seckillPage destroyed')
 		$(this.id).hide()
     }
-    async _getSecKillMyList() {  
-        let res = await mw.seckill.getMySecKillList()
-        res && this._updatePageInfo(res.data)
+
+    /**
+     * 点击事件回调函数
+     * @param {Event} e 
+     */
+    async onClick(e) {
+        let type = $(this).attr('data-type');
+        console.log(`hoseckillPageme onClick event target: ${event.target.id}`)
+        if(type !== 'goods') { //去参与活动按钮
+            router.push('home?focus=seckill')
+            ccData.submitLogClick({
+                page_name: '我的秒杀页',
+                activity_stage: ccData.activity_stage,
+                button_name: '去参加活动'
+            }) 
+        } 
     }
-    _updatePageInfo(list) {
+
+    /**
+     * onFocus
+     * @param {Event} e 
+     */
+    async onFocus(e) {
+        // let ctx = e.data.ctx;
+    }
+
+    /**
+     * 绑定当前页面按钮
+    */
+    bindKeys() {
+        let btns = $(this.coocaaBtns)
+		ccMap.init(btns, btns[0], "btn-focus")
+        ccEvent.bindClick(btns, {ctx:this}, this.onClick)
+        ccEvent.bindFocus(btns, {ctx:this}, this.onFocus)
+    }
+
+    /**
+     * 显示我的秒杀商品
+     */
+    async _showMySeckillGoods() {  
+        let res = await mw.seckill.getMySecKillList()
+        res && this._renderPage(res.data)
+    }
+
+    /**
+     * 渲染页面
+     * @param {Array[Object]} list 秒杀商品列表 
+     */
+    _renderPage(list) {
         if(!list || !list.length) { return }
         let header = `<ul>`,
             body = '',

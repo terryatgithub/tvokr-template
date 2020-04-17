@@ -25,10 +25,10 @@ class ccRouter {
      */
     onHashChange(e){
         console.log(`hash changed: ${location.hash}`)
-        let from = this.routes[this._findRoute(this._from)],
+        let from = this.routes[this._getRouteIndex(this._from)],
             path = this._parseHash(),
-            to = this.routes[this._findRoute(path.h)];
-        from.view.uninit()  
+            to = this.routes[this._getRouteIndex(path.h)];
+        from.view.uninit()  //todo 是否需要改爲async/await
         to.view.init(path.param)    
         this._from = to.name    
     }
@@ -55,10 +55,10 @@ class ccRouter {
     }
 
     /**
-     * 查询对应的路由对象
+     * 获取对应的路由索引
      * @param {String} name 路由地址,比如 'home' 'rule' 
      */
-    _findRoute(name) {
+    _getRouteIndex(name) {
         return this.routes.findIndex((item) => {
             return item.name === name
         })
