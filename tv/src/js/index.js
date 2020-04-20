@@ -4,10 +4,7 @@
  */
 import '../css/common.css'
 import '../css/index.scss'
-import ccMap from '@ccos/ccmap'
 import ccMain from './main.js'
-
-window.ccMap = ccMap
 
 class App {
     constructor() {

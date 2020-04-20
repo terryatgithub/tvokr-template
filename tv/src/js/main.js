@@ -2,6 +2,7 @@
  * Web页面初始化模块
  * 完成全局变量注册、以及初始化相关的逻辑处理
  */
+import ccMap from '@ccos/ccmap'
 import _router from './router/index.js'
 import _store from './store/index.js'
 import _mw from './middleware/index.js'
@@ -18,6 +19,7 @@ import awardPage from './views/award.js'
 import seckillPage from './views/seckill.js'
 import rulesPage from './views/rules.js'
 
+window.ccMap = ccMap
 window.ccRouter = _router
 window.ccStore = _store
 window.ccMw = _mw
