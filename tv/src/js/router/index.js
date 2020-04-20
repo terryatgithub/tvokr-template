@@ -11,6 +11,15 @@ class ccRouter {
     }
 
     /**
+     * 路由初始化
+     */
+    init() {
+        $(window)
+            .off('hashchange')
+            .on('hashchange', this.onHashChange.bind(this))
+    }
+
+    /**
      * 切换页面
      * @param {String} path 需要切换到的页面名称
      */

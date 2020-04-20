@@ -11,6 +11,7 @@ class SeckillMiddleware {
           this.seckillRoundNum = 0 //当前活动是当天第几轮
           this.seckillTimer = null //秒杀商品倒计时timer
      }
+
      /**
       * 秒杀商品初始化
       * @param {Number} day 0：获取当天商品 1获取明天 -1获取昨天 ...
@@ -311,6 +312,72 @@ class SeckillMiddleware {
       */
      disableCountdownTimer() {
           this.seckillTimer && clearTimeout(this.seckillTimer)
+     }
+
+     /**
+      * 获取用户参与活动状态,并弹窗提示
+      * 用于用户从秒杀商品页，返回到宿主页面(首页)时的弹窗提示
+      * @param {Object} ctx 秒杀活动的宿主页面（418OKR为首页）
+      */
+     async getUserParticipationState(ctx) {
+        let res = await ccApi.backend.shopping.getSeckillState()
+        console.log('获取秒杀状态: ' + res)
+        res = JSON.parse(res)
+        if(res.returnCode === '200' || res.returnCode === '300001') { //没有参与过，可继续参与
+            return 
+        } else if(res.returnCode === '200093') { //参与成功
+            ccData.submitLogShow({
+                page_name: '秒杀状态弹窗-秒杀成功',
+                page_type: 'inactivityWindows'
+            })
+            res = await ccDialog.show({
+                title: '恭喜成功参与秒杀活动',
+                icon: require('../../images/dialog/iconok.png'),
+                tip: '*奖品已放入【我的秒杀】，按【返回】键关闭弹窗提示!',
+                btnOK: '知道了',
+                onOK: function() { 
+                    console.log('ok') 
+                    ccData.submitLogClick({
+                        page_name: '秒杀状态弹窗-秒杀成功',
+                        page_type: 'inactivityWindows',
+                        button_name: '知道了-秒杀成功',
+                    })
+                },
+                onCancel: function() {
+                    console.log('cancel')
+                },
+                onComplete: function() { 
+                    console.log('complete')
+                    ctx.bindKeys()
+                }
+            })
+        } else { //参与失败
+            ccData.submitLogShow({
+                page_name: '秒杀状态弹窗-秒杀失败',
+                page_type: 'inactivityWindows'
+            })
+            res = await ccDialog.show({
+                title: '抱歉，秒杀失败，只差一点点了~',
+                icon: require('../../images/dialog/iconfail.png'),
+                tip: ' ',
+                btnOK: '知道了',
+                onOK: function() { 
+                    console.log('ok') 
+                    ccData.submitLogClick({
+                        page_name: '秒杀状态弹窗-秒杀失败',
+                        page_type: 'inactivityWindows',
+                        button_name: '知道了-秒杀失败',
+                    })
+                },
+                onCancel: function() {
+                    console.log('cancel')
+                },
+                onComplete: function() { 
+                    console.log('complete')
+                    ctx.bindKeys()
+                }
+            }) 
+       }
      }
 
 }
