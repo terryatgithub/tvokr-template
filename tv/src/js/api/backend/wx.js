@@ -19,6 +19,9 @@ class WechatBackendApi {
         //
     }
 
+    /**
+     * 返回微信公众号默认二维码url
+     */
     getDefaultUrl() {
         return urls.wxPublicAccountDefaultUrl
     }

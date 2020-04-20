@@ -52,7 +52,7 @@ class MyData {
                     activity_id: info.id,
                     open_id: info.cOpenId,
                });
-          ccApi.tv.logDataCollection({
+          ccMw.tv.logDataCollection({
                eventName: 'web_page_show_new',
                eventParams
           })
@@ -72,7 +72,7 @@ class MyData {
                     activity_id: info.id,
                     open_id: info.cOpenId,
                });
-               ccApi.tv.logDataCollection({
+               ccMw.tv.logDataCollection({
                     eventName: 'web_button_clicked_new',
                     eventParams
                })
@@ -92,7 +92,7 @@ class MyData {
                     activity_id: info.id,
                     open_id: info.cOpenId,
                });
-          ccApi.tv.logDataCollection({
+          ccMw.tv.logDataCollection({
                eventName: 'result_event_new',
                eventParams
           })
@@ -112,7 +112,7 @@ class MyData {
                     activity_id: info.id,
                     open_id: info.cOpenId,
                });
-          ccApi.tv.logDataCollection({
+          ccMw.tv.logDataCollection({
                eventName: 'okr_web_page_show',
                eventParams
           })
@@ -132,7 +132,7 @@ class MyData {
                     activity_id: info.id,
                     open_id: info.cOpenId,
                });
-               ccApi.tv.logDataCollection({
+               ccMw.tv.logDataCollection({
                     eventName: 'okr_web_clicked_result',
                     eventParams
                })

@@ -1,7 +1,5 @@
 import ccView from './view.js'
-import router from '../router/index.js'
 import '../../css/award.scss'
-import mw from '../middleware/index.js'
 
 class AwardPage extends ccView{
 
@@ -62,9 +60,9 @@ class AwardPage extends ccView{
                 button_name: '去参加活动'
             }) 
             if(cur && ccStore.state.ccfrom === 'movie'){
-                router.push('home?focus=divide')
+                ccRouter.push('home?focus=divide')
             } else {
-                router.push('home?focus=draw')
+                ccRouter.push('home?focus=draw')
             }
             return;
         }
@@ -72,10 +70,10 @@ class AwardPage extends ccView{
         ccData.submitLogClick({
             page_name: '奖品点击',
             page_type: 'inactivityWindows',
-            prize_type: mw.myaward.awardsTypeIdObj[curAwardInfo.awardTypeId][1],
+            prize_type: ccMw.myaward.awardsTypeIdObj[curAwardInfo.awardTypeId][1],
             prize_name: curAwardInfo.awardName
         }) 
-        let res = await mw.myaward.showRewardDialog(curAwardInfo, ctx)
+        let res = await ccMw.myaward.showRewardDialog(curAwardInfo, ctx)
         //res为true时领取完后刷新奖品状态（实体奖/优惠券/红包..)
         if(res) { 
           await ctx.refreshPage()
@@ -160,7 +158,7 @@ class AwardPage extends ccView{
      * @param {Boolean} bindKey 
      */
     async _showMyAward(bindKey=true) {
-        let res = await mw.myaward.getMyReward()
+        let res = await ccMw.myaward.getMyReward()
         this._renderAllAward(res, bindKey)
     }
 
@@ -236,7 +234,7 @@ class AwardPage extends ccView{
      */
     _renderMyAward(value, key) { //更新奖品页面
         let header = `<div class="content"> 
-                        <div class="sidebar"><div class="center">${mw.myaward.getChineseNameByType(key)}</div></div>
+                        <div class="sidebar"><div class="center">${ccMw.myaward.getChineseNameByType(key)}</div></div>
                         <ul class="list-wrapper">`,
             body = '',
             foot = `    </ul>

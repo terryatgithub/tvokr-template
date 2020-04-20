@@ -3,8 +3,8 @@
  * 在后台api基础上，封装页面共同的业务逻辑层
  */
 import _url from '../api/backend/url.js'
-import common from './mw_common'
 import {animate} from '../util/index.js'
+import backend from '../api/backend/index.js'
 
 class DrawLuck {
      constructor() {
@@ -33,7 +33,7 @@ class DrawLuck {
        * 初始化抽奖活动
        */
       async initDrawTask() { 
-          let res = await ccApi.backend.act.initDrawTask()
+          let res = await backend.act.initDrawTask()
           console.log('转盘活动初始化: ' + JSON.stringify(res))
           if(res.code == '50003' || res.code === '50042') {
                ccStore.state.actStates = 'end'
@@ -67,8 +67,8 @@ class DrawLuck {
       * @returns Map 返回按要求排序的我的奖品Map
       */
       async getMyReward() {
-          let p1 = ccApi.backend.act.getMyReward(), //瓜分活动
-              p2 = ccApi.backend.act.getMyReward(1); //抽奖活动
+          let p1 = backend.act.getMyReward(), //瓜分活动
+              p2 = backend.act.getMyReward(1); //抽奖活动
           let [res1, res2] = await Promise.all([p1, p2])
           if(res1.code !== '50100' || res2.code !== '50100') {
                ccToast.show('提示<br>网络异常，请重新进入')
@@ -147,7 +147,7 @@ class DrawLuck {
                userKeyId,
                awardTypeId
           },
-          res =await ccApi.backend.act.receiveMyReward(param);
+          res =await backend.act.receiveMyReward(param);
         console.log('领奖:' + JSON.stringify(res))
         return res
      }
@@ -537,7 +537,7 @@ class DrawLuck {
                onclickData = JSON.parse(onclickData)
           }
          
-          ccApi.tv.startCommonPage({
+          ccMw.tv.startCommonPage({
                type: 'action',
                packageName: onclickData.packageName,
                actionName: onclickData.byvalue,
@@ -690,11 +690,11 @@ class DrawLuck {
           let checkApkInstalled = async () => {
                if(apkList[apkId]) { 
                     let pkg = apkList[apkId]['packagename']
-                    let app = await ccApi.tv.getAppInfo(pkg)
+                    let app = await ccMw.tv.getAppInfo(pkg)
                     if(app[pkg].status == '-1') {
                          console.log('apk未安装')
                          ccToast.show('请先安装' + apkList[apkId]['actionname'])
-                         await ccApi.tv.startAppStoreDetail({id:pkg})
+                         await ccMw.tv.startAppStoreDetail({id:pkg})
                          return
                     }
                     let param = {
@@ -706,7 +706,7 @@ class DrawLuck {
                          // params,
                          // extra
                     }
-                    onSuccessFunc = ccApi.tv.startCommonPage.bind(null, param)
+                    onSuccessFunc = ccMw.tv.startCommonPage.bind(null, param)
                }
           }
           let cardid,cardpw;
@@ -751,7 +751,7 @@ class DrawLuck {
       * @param {JQuery Object} ul 中奖消息滚动的父元素ul
       */
      async showLuckyNews(ul) {
-          let res = await ccApi.backend.act.getLuckyNews()
+          let res = await backend.act.getLuckyNews()
           console.log('中奖消息: ' + JSON.stringify(res))
           if(res.code !== '50100') {
               return
@@ -790,7 +790,7 @@ class DrawLuck {
                     ccToast.show('提示<br>本次活动已结束，谢谢参与!');
                     break;
                case (!ccStore.state.hasLogin):
-                    common.goLogin()
+                    ccMw.tv.goLogin()
                     break;
                case (!ccStore.state.luckDrawInfo.isVip):
                     ccToast.show('提示<br>抱歉~您还不是VIP会员~')
@@ -805,7 +805,7 @@ class DrawLuck {
                          button_name: '立即抽奖',
                          button_state: ccStore.state.luckDrawInfo.belongVip 
                      })
-                     res = await ccApi.backend.act.doLuckDraw()
+                     res = await backend.act.doLuckDraw()
                      console.log('抽奖: ' + JSON.stringify(res))
                      if(res.code === '50004') { //移动端用完抽奖机会
                          info.overNum = 0

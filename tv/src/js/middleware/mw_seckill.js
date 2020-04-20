@@ -2,7 +2,7 @@
  * 秒杀商品模块-中间件层
  * 封装跟业务逻辑相关的处理
  */
-import common from './mw_common.js'
+import backend from '../api/backend/index.js'
 
 class SeckillMiddleware {
      constructor() {
@@ -22,7 +22,7 @@ class SeckillMiddleware {
                day = 10 - ccStore.state.luckDrawInfo.startDayNum
           }
           this.seckillDayNum = day
-          let res = await ccApi.backend.shopping.getSeckillGoodsList({
+          let res = await backend.shopping.getSeckillGoodsList({
                source: ccStore.state.source,
                day
           })
@@ -50,7 +50,7 @@ class SeckillMiddleware {
      * 获取我的秒杀商品列表
      */
      async getMySecKillList() {
-          let res = await ccApi.backend.shopping.getSecKillMyList()
+          let res = await backend.shopping.getSecKillMyList()
           console.log('我的秒杀：' + res)
           res = JSON.parse(res)
           if(!(res.returnCode === '200' || res.returnCode === '300001')) {
@@ -255,7 +255,7 @@ class SeckillMiddleware {
             return
         }
         if(!ccStore.state.hasLogin) {
-            common.goLogin()
+            ccMw.tv.goLogin()
             return 
         }
         if(!ccStore.state.luckDrawInfo.isVip) {
@@ -268,13 +268,13 @@ class SeckillMiddleware {
             button_name: '立即秒杀' + productId,
             button_state: `第${round+1}场-` + el.children('.btn_seckill').text(),
         })            
-        let res = await ccApi.backend.shopping.getSeckillState()
+        let res = await backend.shopping.getSeckillState()
         console.log('检查秒杀状态: ' + res)
         res = JSON.parse(res)
         //进入时判断是否有权限
         if(!(res.returnCode === '200' || res.returnCode === '300001')) { 
             //判断用户当前点击商品是否 1.是已秒杀商品 2.是否已付款
-            res = await ccApi.backend.shopping.findOrderByAct(actId) 
+            res = await backend.shopping.findOrderByAct(actId) 
             console.log('检查当前商品状态: ' + res)
             res = JSON.parse(res);
             if(!(res.returnCode === '200' || res.returnCode === '300001')) {
@@ -285,7 +285,7 @@ class SeckillMiddleware {
                     ccToast.show('提示<br>您已参与过本场活动，请下一场再来噢~')
                     return
                 } else { //商品订单详情页
-                    ccApi.tv.startMallOrderDetail({
+                    ccMw.tv.startMallOrderDetail({
                         orderId: res.data.orderSn //todo
                     }) 
                     return
@@ -301,7 +301,7 @@ class SeckillMiddleware {
         }
         
         ccStore.state.seckillGoodsInfo.start = true
-        ccApi.tv.startMallDetail({
+        ccMw.tv.startMallDetail({
             type: 'text', 
             id: productId
         }) 
@@ -320,7 +320,7 @@ class SeckillMiddleware {
       * @param {Object} ctx 秒杀活动的宿主页面（418OKR为首页）
       */
      async getUserParticipationState(ctx) {
-        let res = await ccApi.backend.shopping.getSeckillState()
+        let res = await backend.shopping.getSeckillState()
         console.log('获取秒杀状态: ' + res)
         res = JSON.parse(res)
         if(res.returnCode === '200' || res.returnCode === '300001') { //没有参与过，可继续参与

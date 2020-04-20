@@ -2,6 +2,7 @@
  * 瓜分活动模块-中间件层
  * 封装跟业务逻辑相关的处理
  */
+import backend from '../api/backend/index.js'
 import myaward from './mw_award.js'
 
 class DividActivity {
@@ -14,7 +15,7 @@ class DividActivity {
      */
     async initDividTask() {
         try {
-            let res = await ccApi.backend.act.initDividTask(),
+            let res = await backend.act.initDividTask(),
                 ctx = this,
                 page_state = '加载成功',
                 activity_stage = '活动期间',
@@ -83,7 +84,7 @@ class DividActivity {
      * 获取瓜分剩余天数
      */
     async getDividDaysLeft() {
-        return await ccApi.backend.act.getDividDaysLeft()
+        return await backend.act.getDividDaysLeft()
     }
 
     /**
@@ -95,7 +96,7 @@ class DividActivity {
             draw, 
             collect;
         if(data.entryType > 0) {
-            let ret = await ccApi.backend.act.actSetCrowd()
+            let ret = await backend.act.actSetCrowd()
             console.log('设置人群: ' + JSON.stringify(ret))
             if(ret.code !== '50100') {
                 if(!this._autoCollectCoupon.first) {
@@ -108,7 +109,7 @@ class DividActivity {
         }
 
         if(data.overNum > 0) {
-            draw = await ccApi.backend.act.doLuckDraw(1)
+            draw = await backend.act.doLuckDraw(1)
             console.log('自动领取优惠券 抽奖: ' + JSON.stringify(draw)) 
             if(draw.code !== '50100') {
                 console.log('自动领取优惠券错误')

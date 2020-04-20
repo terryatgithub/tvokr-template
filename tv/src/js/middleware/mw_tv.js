@@ -2,7 +2,7 @@
  * 酷开底层接口-中间件类
  * 根据业务需要封装底层api，封装了如初始化获取设备信息、登录信息
  */
- import lowlayer from './lowlayer.js'
+ import lowlayer from '../api/lowlayer/lowlayer.js'
 
 class TVApi {
     static getInstance() {
@@ -48,6 +48,19 @@ class TVApi {
             ccStore.setUserInfo(res2.data)
         }
     }
+     
+    /**
+      * 登录
+      */
+     goLogin() {
+        ccToast.show('提示<br>请先登录~~')
+        ccStore.state.goLoginPage = true
+        ccData.submitLogShowLogin({
+            page_name: '418会员日活动电视端登录弹窗',
+            page_type: 'inactivityWindows'
+        }) 
+        this._login()
+    }
 
     /**
      * 登录接口,需要用户登录时调用
@@ -57,7 +70,7 @@ class TVApi {
      *      如果出错，返回false
      *      （在监听页面登录addLoginChangedListener里的回调函数里获取登录结果)
      */
-    async login() {
+    async _login() {
         let source = this.source, res
         res = await this.getLoginStatus(false)
         console.log(`${JSON.stringify(res)}`)

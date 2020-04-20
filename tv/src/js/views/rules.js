@@ -37,7 +37,7 @@ class RulePage extends ccView {
      */
     async onClick(e) {
         console.log(`rulesPage onClick event target: ${e.target.id}`)
-        // router.push('home')
+        // ccRouter.push('home')
     }
 
     /**

@@ -2,14 +2,13 @@
  * Web页面初始化模块
  * 完成全局变量注册、以及初始化相关的逻辑处理
  */
-import router from './router/index.js'
-import store from './store/index.js'
-import api from './api/api.js'
+import _router from './router/index.js'
+import _store from './store/index.js'
 import _mw from './middleware/index.js'
 import pcDebug from './debug/debug.js'
 import _util from './util/index.js'
 import _data from './util/datacollect.js'
-import _dialog from './component/dialog.js'
+import _dialog from './component/dialog.js' //todo 所有弹窗是否归为一个对象
 import _qrcode from './component/qrcode.js'
 import _kami from './component/kami.js'
 import _entityCollected from './component/entitycollected.js'
@@ -19,8 +18,8 @@ import awardPage from './views/award.js'
 import seckillPage from './views/seckill.js'
 import rulesPage from './views/rules.js'
 
-window.ccStore = store
-window.ccApi = api
+window.ccRouter = _router
+window.ccStore = _store
 window.ccMw = _mw
 window.ccUtil = _util
 window.ccData = _data
@@ -53,9 +52,9 @@ class Main {
     async _init() {
         try { 
             console.log(`process.env.NODE_ENV: ${process.env.NODE_ENV}`)
-            router.init()
+            ccRouter.init()
             this._setActId()
-            await ccApi.tv.init()
+            await ccMw.tv.init()
             await homePage.init()
             if(ccUtil.isDevMode() || ccUtil.isMockMode()) {
                 pcDebug.init(this)
@@ -71,7 +70,7 @@ class Main {
      * 比如用户登录状态等
      */
     _listenStateChange() {
-        ccApi.tv.addLoginChangedListener(async res => {
+        ccMw.tv.addLoginChangedListener(async res => {
             console.log(`用户登录状态发生变化, data: ${JSON.stringify(res)}`)
             if(!res.userchangged) { return }
             await this._callbackInitOnResume()
@@ -107,7 +106,7 @@ class Main {
                     dlgShow.hide()
                     awardPage.bindKeys()
                 } else {
-                    router.push('home')
+                    ccRouter.push('home')
                 }
                 break;
             case rulesPage.isShow(): 
@@ -115,7 +114,7 @@ class Main {
                     dlgShow.hide()
                     rulesPage.bindKeys()
                 } else {
-                    router.push('home')
+                    ccRouter.push('home')
                 }
                 break;
             case seckillPage.isShow(): 
@@ -123,7 +122,7 @@ class Main {
                     dlgShow.hide()
                     seckillPage.bindKeys()
                 } else {
-                    router.push('home')
+                    ccRouter.push('home')
                 }
                 break;
         }
@@ -173,7 +172,7 @@ class Main {
      */
     async _callbackInitOnResume(){
         // ccToast.show('提示<br>页面刷新中，请稍候~', 10000)  
-        await ccApi.tv.init(false)
+        await ccMw.tv.init(false)
         await homePage.init()
         // ccToast.hide()
     }

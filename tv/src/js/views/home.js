@@ -3,9 +3,7 @@
  * 处理跟页面交互相关的逻辑
  */
 import ccView from './view.js'
-import router from '../router/index.js'
 import '../../css/home.scss'
-import mw from '../middleware/index.js'
 
 class HomePage extends ccView{
     
@@ -53,7 +51,7 @@ class HomePage extends ccView{
      */
 	destroyed() {
         console.log('home destroyed')
-        mw.seckill.disableCountdownTimer()
+        ccMw.seckill.disableCountdownTimer()
         this.data.pageRefreshTimer && clearTimeout(this.data.pageRefreshTimer)
 		$(this.id).hide()
     }
@@ -70,7 +68,7 @@ class HomePage extends ccView{
         switch(id){
             case 'goAwardPage': //去‘我的奖品’
                 if(!ccStore.state.hasLogin) {
-                    mw.common.goLogin()
+                    ccMw.tv.goLogin()
                     return 
                 }
                 ccData.submitLogClick({
@@ -78,10 +76,10 @@ class HomePage extends ccView{
                     activity_stage: ccData.activity_stage,
                     button_name: '我的奖品'
                 })
-                router.push('award')
+                ccRouter.push('award')
                 break; 
             case 'goCheckRule': //去‘查看规则’
-                router.push('rules')
+                ccRouter.push('rules')
                 ccData.submitLogClick({
                     page_name: '活动主页面',
                     activity_stage: ccData.activity_stage,
@@ -90,10 +88,10 @@ class HomePage extends ccView{
                 break;     
             case 'goSeckillPage': //去‘我的秒杀’
                 if(!ccStore.state.hasLogin) {
-                    mw.common.goLogin()
+                    ccMw.tv.goLogin()
                     return 
                 }
-                router.push('seckill')
+                ccRouter.push('seckill')
                 ccData.submitLogClick({
                     page_name: '活动主页面',
                     activity_stage: ccData.activity_stage,
@@ -127,7 +125,7 @@ class HomePage extends ccView{
                             ctx._goVipBuyPage(type)
                             break;
                         case 'seckillitem': //去‘秒杀商品详情页’
-                            mw.seckill.goSeckillPage($(this))
+                            ccMw.seckill.goSeckillPage($(this))
                             break;
                     }
                     return
@@ -295,9 +293,9 @@ class HomePage extends ccView{
      * 显示移动端活动二维码
      */
     async _showMobActQrCode() {
-        let p1 = ccApi.backend.wx.getTmpQrcode(1),
-            p2 = ccApi.backend.wx.getTmpQrcode(2),
-            url1 = ccApi.backend.wx.getDefaultUrl(),
+        let p1 = ccMw.wx.getTmpQrcode(1),
+            p2 = ccMw.wx.getTmpQrcode(2),
+            url1 = ccMw.wx.getDefaultUrl(),
             url2 = url1;
         let [res1, res2] = await Promise.all([p1, p2])
         url1 = res1.code == 200 ? res1.data : url1
@@ -317,14 +315,14 @@ class HomePage extends ccView{
      */
     async _showLuckyNews() {
         let ul = $('#homeLuckyNewsList')
-        await mw.myaward.showLuckyNews(ul)
+        await ccMw.myaward.showLuckyNews(ul)
     }
 
     /**
      * 瓜分活动初始化
      */
     async initDivid() { 
-        let res = await mw.divid.initDividTask()
+        let res = await ccMw.divid.initDividTask()
         if(res) {
             if(res.resMsg === 'ok') {
                 $(`${this.id} .left-day`).text(res.dayNum)
@@ -339,7 +337,7 @@ class HomePage extends ccView{
      */
     async initDraw() { 
         if(!ccStore.state.hasLogin) return  //未登录不能初始化抽奖
-        let res = await mw.myaward.initDrawTask()
+        let res = await ccMw.myaward.initDrawTask()
         if(res.resMsg) {
             $(`${this.id}`).find('.draw-num').text('X' + res.overNum)
         }
@@ -350,7 +348,7 @@ class HomePage extends ccView{
      * @param {Number} day 
      */
     async initSeckill(day=0) {
-        let res = await mw.seckill.initSeckillItems(day)
+        let res = await ccMw.seckill.initSeckillItems(day)
         res && this.bindKeys() //更新秒杀商品列表后需要重新绑定，因为目前的做法会更新元素
     }
 
@@ -378,7 +376,7 @@ class HomePage extends ccView{
         }
         console.log('startMovieMemberCenter: ' + idx)
         ccStore.state.goVipBuyPage = true
-        ccApi.tv.startMovieMemberCenter({sourceId: (info.vipSourceId[idx]).toString()})        
+        ccMw.tv.startMovieMemberCenter({sourceId: (info.vipSourceId[idx]).toString()})        
     }
 
     /**
@@ -387,7 +385,7 @@ class HomePage extends ccView{
     async _drawLuck() { 
         this._unbindKeys()
         $('#homeGoLuckDraw').removeClass('btn-focus')
-        let res = await mw.myaward.clickLuckDraw(this)
+        let res = await ccMw.myaward.clickLuckDraw(this)
         if(res.state) {
             $(`${this.id}`).find('.draw-num').text(`X${res.overNum}`)
         }
@@ -406,8 +404,8 @@ class HomePage extends ccView{
             this.data.pageRefreshTimer = setTimeout(this._refreshDaysNStocks.bind(this), delay)
             return 
         }        
-        let p1 = mw.divid.getDividDaysLeft(),
-            p2 = this.initSeckill(mw.seckill.seckillDayNum)
+        let p1 = ccMw.divid.getDividDaysLeft(),
+            p2 = this.initSeckill(ccMw.seckill.seckillDayNum)
         let [res1, res2] = await Promise.all([p1, p2])
         console.log('剩余天数: ' + res1.data.surplusDay)
         if(res1.code === '50100') {

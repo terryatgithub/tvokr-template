@@ -1,6 +1,4 @@
 import ccView from './view.js'
-import router from '../router/index.js'
-import mw from '../middleware/index.js'
 import '../../css/seckill.scss'
 
 class SeckillPage extends ccView{
@@ -47,7 +45,7 @@ class SeckillPage extends ccView{
         let type = $(this).attr('data-type');
         console.log(`hoseckillPageme onClick event target: ${event.target.id}`)
         if(type !== 'goods') { //去参与活动按钮
-            router.push('home?focus=seckill')
+            ccRouter.push('home?focus=seckill')
             ccData.submitLogClick({
                 page_name: '我的秒杀页',
                 activity_stage: ccData.activity_stage,
@@ -68,7 +66,7 @@ class SeckillPage extends ccView{
      * 显示我的秒杀商品
      */
     async _showMySeckillGoods() {  
-        let res = await mw.seckill.getMySecKillList()
+        let res = await ccMw.seckill.getMySecKillList()
         res && this._renderPage(res.data)
     }
 
