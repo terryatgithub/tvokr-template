@@ -1,6 +1,24 @@
 # 418 会员日 TV端活动
 
-## 1. 项目发布地址
+## 1. 进行开发
+    ### 使用后台测试环境接口开发
+    1) pc端开发(推荐)
+        npm run dev
+        会自动打开浏览器，直接调试即可
+    2) TV端开发
+        npm run deploy:dev 
+        会自动发布到ftp(注意目录不能重复，目录在/config/index.js修改),
+        在TV串口打开即可看
+
+    ### 使用后台 正式环境接口 开发
+    1) pc端开发
+
+    ### 使用后台mock接口开发
+    1) pc端开发
+        npm run mock
+        会自动打开浏览器，直接调试即可
+
+## 2. 项目发布地址
 1) 测试环境url:
     logcat -c; am start -a coocaa.intent.action.browser --es "url" "http://beta.webapp.skysrt.com/yuanbo/test/test/index.html" ; logcat -s chromium WebViewSDK  \r
 
@@ -29,25 +47,6 @@
         ccfrom=edu (教育入口)
         ccfrom=kid (少儿入口)
         ccfrom=game (游戏入口)
-
-
-## 2. 进行开发
-    ### 使用后台mock接口开发
-    1) pc端开发
-        npm run mock
-        会自动打开浏览器，直接调试即可
-
-    ### 使用后台测试环境接口开发
-    1) pc端开发
-        npm run dev
-        会自动打开浏览器，直接调试即可
-    2) TV端开发
-        npm run deploy:dev 
-        会自动发布到ftp(注意目录不能重复，目录在/config/index.js修改),
-        在TV串口打开即可看
-
-    ### 使用后台 正式环境接口 开发
-    1) pc端开发
 
 
 ## 项目相关文档
