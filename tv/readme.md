@@ -1,6 +1,12 @@
 # 418 会员日 TV端活动
 
 ## 1. 进行开发
+    ### 代码下载和环境配置
+    git clone git@gitlab.skysri.com:yuanbo/tv-ccos-template.git
+    cd tv/
+    npm install -g cnpm --registry=https://registry.npm.taobao.org
+    cnpm install
+
     ### 使用后台测试环境接口开发
     1) pc端开发(推荐)
         npm run dev
