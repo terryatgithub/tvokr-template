@@ -6,7 +6,7 @@
         npm run dev
         会自动打开浏览器，直接调试即可
     2) TV端开发
-        npm run deploy:dev 
+        npm run dev:deploy
         会自动发布到ftp(注意目录不能重复，目录在/config/index.js修改),
         在TV串口打开即可看
 
