@@ -36,7 +36,7 @@ window.ccToast = _toast
  */
 class Main {
     constructor() {
-
+        //todo
     }
 
     /**
