@@ -214,10 +214,7 @@ class Main {
     async onResumeEvent() {
         console.log('onResumeEvent')
 
-        if(ccStore.state.seckillGoodsInfo.start) { //秒杀参与情况查询
-            ccStore.state.seckillGoodsInfo.start = false
-            ccMw.seckill.getUserParticipationState(homePage)
-        } else if(ccStore.state.goVipBuyPage) { //从产品包页面返回后刷新页面
+        if(ccStore.state.goVipBuyPage) { //从产品包页面返回后刷新页面
             ccStore.state.goVipBuyPage = false
             await this._callbackInitOnResume()
         }

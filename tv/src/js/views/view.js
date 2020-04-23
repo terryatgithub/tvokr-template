@@ -57,6 +57,20 @@ class View {
         ccMap.init('', '', "")
         ccEvent.unbindAllKeys($(this.coocaaBtns))
     }
+
+    /**
+     * 复位页面焦点到指定按钮，默认复位到index为0的按钮
+     * @param {*} focus 
+     */
+    _resetFocus(focus) {
+        let btns = $(this.coocaaBtns), f;
+        if(focus) {
+            this.curFocus = $(this.coocaaBtns).index(focus);
+        } 
+        f = focus || $(btns[this.curFocus])
+        ccMap.init(btns, f, "btn-focus")
+        f.trigger('itemFocus')
+    }
     
 }
 

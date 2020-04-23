@@ -1,67 +1,8 @@
 #deviceready {
     #seckillPage {
         background: url('../images/award/bg.jpg') no-repeat top;
-        .scroll-wrapper {
-            height: 600px;
-        }
-        .header {
-            width: 304px;
-            height: 65px;
-            margin: 7px auto 110px;
-            background: url('../images/award/titleseckill.png') no-repeat center/100%;
-        }
-        .seckill {
-            position: relative;
-            margin: 0 auto;
-            padding-bottom: 100px;
-            width: 1083px;
-            li {
-                position: relative;
-                width: 100%;
-                height: 185px;
-                margin-bottom: 61px;
-                background: url('../images/award/iconseckill.png') center/contain no-repeat;
-
-                &>* {
-                    position: absolute;
-                }
-
-                img {
-                    top: 15px;
-                    left: 35px;
-                    width: 156px;
-                    height: 156px;
-                }
-                .text {
-                    color: #c85504;
-                    left: 215px;
-                }
-                .title {
-                    top: 20px;
-                    font-size: 25px;
-                }
-                .price{
-                    top: 120px;
-                    font-size: 28px;
-                }
-                .address-zone {
-                    top: 50%;
-                    transform: translateY(-50%);
-                    -webkit-transform: translateY(-50%);
-                    right: 30px;
-                    width: 43%;
-                    line-height: 1.4;
-                    border-left: 1px solid #c85504;
-                    padding-left: 44px;
-                    font-size: 24px;
-                    color: #ad6a08;
-                }
-            }
-        }
-
-
     }
-
+    
 }
 
 

@@ -19,7 +19,9 @@ class ShoppingBackendApi {
     }
 
     constructor() {
-        //
+        //秒杀起止时间,用于获取活动时间内‘我的秒杀商品’
+        this.seckillPeriodStart = '2020-4-09 00:00:00'
+        this.seckillPeriodEnd = '2020-4-20 00:00:00'
     }
     
     /**
@@ -85,8 +87,8 @@ class ShoppingBackendApi {
     async getSecKillMyList() {
         let data = {
             openId: ccStore.state.userInfo.open_id,
-            startDate: ccStore.state.actPeriod.start,
-            endDate: ccStore.state.actPeriod.end,            
+            startDate: this.seckillPeriodStart,
+            endDate: this.seckillPeriodEnd,            
         }
         data = {
             param: JSON.stringify(data)
