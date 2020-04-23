@@ -19,6 +19,18 @@ const state = {
     homepageVersion: 0, //主页版本号
     userKeyId: '',  //后台返回的标识用户唯一身份的字段
     ccfrom: 'movie',//进入活动的来源, 默认影视，可在url后配置：ccfrom=edu/kid/game
+    luckDrawInfo: { //抽奖后台返回的用戶VIP信息
+        isVip: false,
+        vipType: 0,
+        overNum: 0,
+        vipSourceId: {
+            'movieiyiqi': 1, //影视奇异
+            'movietencent': 5, //影视腾讯
+            'edu': 58, //教育
+            'kid': 57, //少儿
+            'game': 56 //电竞
+        }
+    },
 }
 
 export default state

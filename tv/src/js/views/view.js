@@ -1,6 +1,7 @@
 /**
  * 页面纯基类，不能被实例化,只能被继承
  */
+import ccmap from '@ccos/ccmap'
 import ccEvent from '../eventhandler/index.js'
 
 class View {
@@ -45,7 +46,7 @@ class View {
      */
     bindKeys() {
         let btns = $(this.coocaaBtns)
-        ccMap.init(btns, btns[this.curFocus], "btn-focus")
+        ccmap.init(btns, btns[this.curFocus], "btn-focus")
         ccEvent.bindClick(btns, {ctx:this}, this.onClick)
         ccEvent.bindFocus(btns, {ctx:this}, this.onFocus)
     }
@@ -54,7 +55,7 @@ class View {
      * 解绑按钮
      */
     _unbindKeys() {
-        ccMap.init('', '', "")
+        ccmap.init('', '', "")
         ccEvent.unbindAllKeys($(this.coocaaBtns))
     }
 
@@ -68,7 +69,7 @@ class View {
             this.curFocus = $(this.coocaaBtns).index(focus);
         } 
         f = focus || $(btns[this.curFocus])
-        ccMap.init(btns, f, "btn-focus")
+        ccmap.init(btns, f, "btn-focus")
         f.trigger('itemFocus')
     }
     

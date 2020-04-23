@@ -97,6 +97,15 @@ class HomePage extends ccView{
             case 'entityId': 
                 await ctx._showEntityDialog()
                 break;
+            case 'toastId': 
+                ccToast.show('哈喽<br>雷猴，请稍候~')  
+                break;
+            case 'lowerId':
+                await ctx._showLowerDemo()
+                break;
+            case 'backendId':
+                await ctx._showBackendDemo()
+                break;    
             default: //如果被点击元素没有id
                 {
                     return
@@ -231,6 +240,23 @@ class HomePage extends ccView{
         }) 
         this.bindKeys()
     }
+
+    /**
+     * demo 调用底层接口
+     */
+    async _showLowerDemo() {
+        let info = await ccMw.tv.getDeviceInfo();
+        $('#lowerInfo').html(JSON.stringify(info))
+    }
+
+    /**
+     * demo 调用后台接口
+     */
+    async _showBackendDemo() {
+        let info = await ccMw.myaward.initDrawTask();
+        $('#backendInfo').html(JSON.stringify(info))
+    }
+
 }
 
 const homePage = new HomePage('#homePage')

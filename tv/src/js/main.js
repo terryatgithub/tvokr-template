@@ -2,34 +2,36 @@
  * Web页面初始化模块
  * 完成全局变量注册、以及初始化相关的逻辑处理
  */
-import ccMap from '@ccos/ccmap'
 import _router from './router/index.js'
 import _store from './store/index.js'
 import _mw from './middleware/index.js'
-import pcDebug from './debug/debug.js'
 import _util from './util/index.js'
 import _data from './util/datacollect.js'
-import _dialog from './component/dialog.js' //todo 所有弹窗是否归为一个对象
+import pcDebug from './debug/debug.js'
+
+import _dialog from './component/dialog.js' 
 import _qrcode from './component/qrcode.js'
 import _kami from './component/kami.js'
 import _entityCollected from './component/entitycollected.js'
 import _toast from './component/toast.js'
+
 import homePage from './views/home.js'
 import awardPage from './views/award.js'
 import seckillPage from './views/seckill.js'
 import rulesPage from './views/rules.js'
 
-window.ccMap = ccMap
+//全局对象
 window.ccRouter = _router
 window.ccStore = _store
 window.ccMw = _mw
 window.ccUtil = _util
 window.ccData = _data
-window.ccDialog = _dialog
+//全局组件
+window.ccToast = _toast
+window.ccDialog = _dialog //todo 所有弹窗是否归为一个对象
 window.ccQrCode = _qrcode
 window.ccKami = _kami
 window.ccEntityCollected = _entityCollected
-window.ccToast = _toast
 
 /**
  * Web页面初始化类

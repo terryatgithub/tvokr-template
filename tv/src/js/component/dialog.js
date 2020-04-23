@@ -1,3 +1,4 @@
+import ccmap from '@ccos/ccmap'
 import '../../css/dialog.scss'
 import ccEvent from '../eventhandler/index.js';
 
@@ -113,8 +114,8 @@ class Dialog {
 		$('#dialog').show()
 		//初始化焦点，并注册onClick
 		let btns = $(`${this.id} .coocaa_btn`),
-			defFocus = param.defFocus == 'cancel' ? '.dialog-cancel' : '.dialog-confirm'
-		ccMap.init(btns, btns.filter(defFocus), "btn-focus")
+			defFocus = param.defFocus == 'cancel' ? '.dialog-cancel' : '.dialog-confirm';
+		ccmap.init(btns, btns.filter(defFocus), "btn-focus")
 		ccEvent.bindClick(btns, {ctx: this}, this.onClick)
 	}
 	/**
