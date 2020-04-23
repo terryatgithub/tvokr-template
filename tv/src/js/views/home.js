@@ -149,6 +149,49 @@ class HomePage extends ccView{
                 }
                 homePage.bindKeys()
                 break;
+            case 'qrId': 
+                {
+                    let qrUrl =await ccUtil.showQrCode({ url: 'http://www.coocaa.com', urlOnly: true })
+                    ret = await ccQrCode.show({
+                        title: '恭喜获得5元巨款',
+                        icon: qrUrl,
+                        tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
+                        btnOK: '知道了',
+                        onOK: function() { 
+                            console.log('ok') 
+                        },
+                        onCancel: function() {
+                            console.log('cancel')
+                        },
+                        onComplete: function() { 
+                            console.log('complete')
+                        }
+                    })
+                    ctx.bindKeys()    
+                }
+                break;
+            case 'entityId': 
+                {
+                    let detail = `收货人: 張三<br>手机: 13555555555<br>收货地址: 北京市前門佛阿吉爾菲娜拉爾囧附件二及分類`;
+                    ret = await ccEntityCollected.show({
+                        title: '恭喜获得实物奖',
+                        icon: 'http://res.lottery.coocaatv.com//uploads/img/20200403/20200403150636832115.png',
+                        tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
+                        detail,
+                        btnOK: '已领取',
+                        onOK: function() { 
+                            console.log('ok') 
+                        },
+                        onCancel: function() {
+                            console.log('cancel')
+                        },
+                        onComplete: function() { 
+                            console.log('complete')
+                            ctx.bindKeys()
+                        }
+                }) 
+                }
+                break;
             default: //如果被点击元素没有id
                 {
                     return

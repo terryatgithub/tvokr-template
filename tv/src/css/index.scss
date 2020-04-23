@@ -46,8 +46,11 @@ $btnFocusColor: #4cf3e1;
         border: 4px solid $btnFocusColor;
     }
     .btn {
-        width: 200px;
-        height: 100px;
+        width: 100px;
+        height: 50px;
+        background: lightcoral;
+        margin: 10px;
+        display: inline-block;
     }
     ul {
         font-size: 0;
