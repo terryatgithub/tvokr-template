@@ -62,7 +62,7 @@ class Dialog {
 	 * 查找当前显示的弹窗实例
 	 * @returns {Dialog} 当前显示的弹窗实例
 	 */
-	isShow() {
+	isShow() { //todo 这里要重点说明或后续优化当前这种模式
 		let dlg = null
 		if($('#dialog').css('display') === 'none') return dlg;
 		//每个弹窗实例对应的className

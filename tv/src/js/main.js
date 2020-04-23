@@ -184,30 +184,29 @@ class Main {
     /**
      * 主页挽留弹窗
      */
-    showDialogAskUserStay() {
+    async showDialogAskUserStay() {
         ccData.submitLogShow({
             page_name: '退出活动挽留弹窗',
             page_type: 'inactivityWindows'
         })
-        ccDialog.show({
+        let ret = await ccDialog.show({
             title: '会员享好礼，限时秒杀天天有哦!<br>确定要退出吗?',
             icon: require('../images/dialog/iconleave.png'),
             btnOK: '狠心离开',
             btnCancel: '手抖了',
             defFocus: 'cancel',
-            onOK: function() {
-                console.log('ok') 
-                ccData.submitLogResult({
-                    page_name: '活动主页面',
-                    stay_duration: ccUtil.getNowTimeSecond() - ccData.timePageStart
-                }) 
-                ccApp.exitPage();
-            },
-            onCancel: function() {
-                console.log('cancel')
-                homePage.bindKeys()
-            }
         })
+        if(ret.confirm) {
+            console.log('ok') 
+            ccData.submitLogResult({
+                page_name: '活动主页面',
+                stay_duration: ccUtil.getNowTimeSecond() - ccData.timePageStart
+            }) 
+            ccApp.exitPage();
+        } else {
+            console.log('cancel')
+            homePage.bindKeys()
+        }
     }
 
     /**
