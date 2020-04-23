@@ -137,7 +137,7 @@ class SeckillMiddleware {
                           <div>已售<span class="progresspercent">${soldPercent}</span>%</div>
                       </div>
                       <div class="btn_seckill"></div>
-                      <img class="focusbg" src="${require('../../images/home/4framefocus.png')}"/>
+                      <img class="focusbg" src="${require('../../images/seckill/framefocus.png')}"/>
                   </li>`
           })
           ccStore.state.seckillGoodsInfo.seckillGoodsId = goodsId.join()
