@@ -1,5 +1,5 @@
 # 418 会员日 TV端活动
-
+test github Pages
 ## 1. 进行开发
     ### 代码下载和环境配置
     git clone git@gitlab.skysri.com:yuanbo/tv-ccos-template.git
