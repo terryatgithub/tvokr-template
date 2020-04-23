@@ -86,111 +86,16 @@ class HomePage extends ccView{
                 })
                 break; 
             case 'oneToastId': 
-                ret = await ccDialog.show({
-                    title: '一个弹窗',
-                    icon: require('../../images/dialog/iconleave.png'),
-                    btnOK: '确认',
-                    btnCancel: '取消',
-                    onOK: function() {
-                        console.log('ok') 
-                    },
-                    onCancel: function() {
-                        console.log('cancel')
-                    }
-                })
-                if(ret.confirm) {
-                    alert('ok')
-                } else {
-                    alert('cancel')
-                }
-                homePage.bindKeys()
+                await ctx._showOneDialog()
                 break;
             case 'multiToastId': 
-                ret = await ccDialog.show({
-                    title: '第一个弹窗',
-                    icon: require('../../images/dialog/iconleave.png'),
-                    btnOK: '确认',
-                    btnCancel: '取消',
-                    onOK: function() {
-                        console.log('ok') 
-                    },
-                    onCancel: function() {
-                        console.log('cancel')
-                    }
-                })
-                ret = await ccDialog.show({
-                    title: '第2个弹窗',
-                    icon: require('../../images/dialog/iconleave.png'),
-                    btnOK: '确认',
-                    btnCancel: '取消',
-                    onOK: function() {
-                        console.log('ok') 
-                    },
-                    onCancel: function() {
-                        console.log('cancel')
-                    }
-                })
-                await ccDialog.show({
-                    title: '第3个弹窗',
-                    icon: require('../../images/dialog/iconleave.png'),
-                    btnOK: '确认',
-                    btnCancel: '取消',
-                    onOK: function() {
-                        console.log('ok') 
-                    },
-                    onCancel: function() {
-                        console.log('cancel')
-                    }
-                })
-                if(ret.confirm) {
-                    alert('ok')
-                } else {
-                    alert('cancel')
-                }
-                homePage.bindKeys()
+                await ctx._showMultiDialog()                
                 break;
             case 'qrId': 
-                {
-                    let qrUrl =await ccUtil.showQrCode({ url: 'http://www.coocaa.com', urlOnly: true })
-                    ret = await ccQrCode.show({
-                        title: '恭喜获得5元巨款',
-                        icon: qrUrl,
-                        tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
-                        btnOK: '知道了',
-                        onOK: function() { 
-                            console.log('ok') 
-                        },
-                        onCancel: function() {
-                            console.log('cancel')
-                        },
-                        onComplete: function() { 
-                            console.log('complete')
-                        }
-                    })
-                    ctx.bindKeys()    
-                }
+                await ctx._showQrDialog()
                 break;
             case 'entityId': 
-                {
-                    let detail = `收货人: 張三<br>手机: 13555555555<br>收货地址: 北京市前門佛阿吉爾菲娜拉爾囧附件二及分類`;
-                    ret = await ccEntityCollected.show({
-                        title: '恭喜获得实物奖',
-                        icon: 'http://res.lottery.coocaatv.com//uploads/img/20200403/20200403150636832115.png',
-                        tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
-                        detail,
-                        btnOK: '已领取',
-                        onOK: function() { 
-                            console.log('ok') 
-                        },
-                        onCancel: function() {
-                            console.log('cancel')
-                        },
-                        onComplete: function() { 
-                            console.log('complete')
-                            ctx.bindKeys()
-                        }
-                }) 
-                }
+                await ctx._showEntityDialog()
                 break;
             default: //如果被点击元素没有id
                 {
@@ -208,6 +113,124 @@ class HomePage extends ccView{
         ctx.curFocus = $(this).index(ctx.coocaaBtns)
     }
 
+    /**
+     * demo 显示一个弹窗
+     */
+    async _showOneDialog() {
+        let ret = await ccDialog.show({
+            title: '一个弹窗',
+            icon: require('../../images/dialog/iconleave.png'),
+            btnOK: '确认',
+            btnCancel: '取消',
+            onOK: function() {
+                console.log('ok') 
+            },
+            onCancel: function() {
+                console.log('cancel')
+            }
+        })
+        if(ret.confirm) {
+            alert('ok')
+        } else {
+            alert('cancel')
+        }
+        this.bindKeys()
+    }
+
+    /**
+     * demo 显示多个弹窗
+     */
+    async _showMultiDialog() {
+        let ret = await ccDialog.show({
+            title: '第一个弹窗',
+            icon: require('../../images/dialog/iconleave.png'),
+            btnOK: '确认',
+            btnCancel: '取消',
+            onOK: function() {
+                console.log('ok') 
+            },
+            onCancel: function() {
+                console.log('cancel')
+            }
+        })
+        ret = await ccDialog.show({
+            title: '第2个弹窗',
+            icon: require('../../images/dialog/iconleave.png'),
+            btnOK: '确认',
+            btnCancel: '取消',
+            onOK: function() {
+                console.log('ok') 
+            },
+            onCancel: function() {
+                console.log('cancel')
+            }
+        })
+        await ccDialog.show({
+            title: '第3个弹窗',
+            icon: require('../../images/dialog/iconleave.png'),
+            btnOK: '确认',
+            btnCancel: '取消',
+            onOK: function() {
+                console.log('ok') 
+            },
+            onCancel: function() {
+                console.log('cancel')
+            }
+        })
+        if(ret.confirm) {
+            alert('ok')
+        } else {
+            alert('cancel')
+        }
+        this.bindKeys()
+    }
+
+    /**
+     * demo 显示二维码弹窗
+     */
+    async _showQrDialog() {
+        let qrUrl =await ccUtil.showQrCode({ url: 'http://www.coocaa.com', urlOnly: true })
+        let ret = await ccQrCode.show({
+            title: '恭喜获得5元巨款',
+            icon: qrUrl,
+            tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
+            btnOK: '知道了',
+            onOK: function() { 
+                console.log('ok') 
+            },
+            onCancel: function() {
+                console.log('cancel')
+            },
+            onComplete: function() { 
+                console.log('complete')
+            }
+        })
+        this.bindKeys()    
+    }
+
+    /**
+     * demo 显示实体二维码弹窗
+     */
+    async _showEntityDialog() {
+        let detail = `收货人: 張三<br>手机: 13555555555<br>收货地址: 北京市前門佛阿吉爾菲娜拉爾囧附件二及分類`;
+        let ret = await ccEntityCollected.show({
+            title: '恭喜获得实物奖',
+            icon: 'http://res.lottery.coocaatv.com//uploads/img/20200403/20200403150636832115.png',
+            tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
+            detail,
+            btnOK: '已领取',
+            onOK: function() { 
+                console.log('ok') 
+            },
+            onCancel: function() {
+                console.log('cancel')
+            },
+            onComplete: function() { 
+                console.log('complete')
+            }
+        }) 
+        this.bindKeys()
+    }
 }
 
 const homePage = new HomePage('#homePage')
