@@ -1,7 +1,7 @@
 /**
  * Toast对象
  */
-import '../../css/toast.scss'
+import './toast.scss'
 
 class Toast {
 	constructor(selector) {

@@ -6,6 +6,27 @@ import '../css/common.css'
 import '../css/index.scss'
 import ccMain from './main.js'
 
+import homeHtml from './views/home/home.html'
+import awardHtml from './views/award/award.html'
+import rulesHtml from './views/rules/rules.html'
+import seckillHtml from './views/seckill/seckill.html'
+import toastHtml from './component/toast/toast.html'
+import dialogHtml from './component/dialog/dialog.html'
+
+function generateHtml() {
+    const content = [
+        '<div id="deviceready">',
+        homeHtml,
+        awardHtml,
+        rulesHtml,
+        seckillHtml,
+        toastHtml,
+        dialogHtml,
+        '</div>'
+    ]
+    document.write(content.join())
+}
+
 class App {
     constructor() {
     }
@@ -20,6 +41,7 @@ class App {
     initialize() {
         console.log("page start initialize...")
         // ccApp.ccDebug.setDeviceInfo({ chip: "bbb" })
+        generateHtml()
         this.bindEvents()
     }
 

@@ -1,5 +1,5 @@
-import ccView from './view.js'
-import '../../css/award.scss'
+import ccView from './../view.js'
+import './award.scss'
 
 class AwardPage extends ccView{
 

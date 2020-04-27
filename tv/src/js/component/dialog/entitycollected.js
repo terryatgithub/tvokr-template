@@ -1,12 +1,12 @@
 /**
- * 二维码弹窗
+ * 实体奖已领取弹窗
  * 继承普通弹窗
  */
 import SubDialog from './subdialog.js'
-import '../../css/qrcode.scss'
+import './entitycollected.scss'
 
-class QrCodeDialog extends SubDialog {
-
+class EntityCollectedDialog extends SubDialog {
+	
     constructor(selector) {
         super(selector)
     }
@@ -20,11 +20,10 @@ class QrCodeDialog extends SubDialog {
         dlg.find('.title').text(param.title || '温馨提示')
         dlg.find('.icon').attr('src', param.icon)
         dlg.find('.tip').text(param.tip || '')
-        dlg.find('.detail').html(param.detail || '请微信扫码完善收货信息<br>奖品将送达您手中')
+        dlg.find('.detail').html(param.detail || '请微信扫码完善收获信息，奖品将送达您手中')
         dlg.filter('.dialog-confirm').text(param.btnOK || '确认')
-        dlg.filter('.dialog-cancel').text(param.btnCancel || '取消')
-    }
+        dlg.filter('.dialog-cancel').text(param.btnCancel || '取消')    }
 }
 
-const qrcode = new QrCodeDialog('#dialog .qrcode')
-export default qrcode
+const entityCollected = new EntityCollectedDialog('#dialog .entity-collected')
+export default entityCollected

@@ -2,8 +2,8 @@
  * 活动首页
  * 处理跟页面交互相关的逻辑
  */
-import ccView from './view.js'
-import '../../css/home.scss'
+import ccView from './../view.js'
+import './home.scss'
 
 class HomePage extends ccView{
     
@@ -128,7 +128,7 @@ class HomePage extends ccView{
     async _showOneDialog() {
         let ret = await ccDialog.show({
             title: '一个弹窗',
-            icon: require('../../images/dialog/iconleave.png'),
+            icon: require('../../../images/dialog/iconleave.png'),
             btnOK: '确认',
             btnCancel: '取消',
         })
@@ -146,19 +146,19 @@ class HomePage extends ccView{
     async _showMultiDialog() {
         let ret = await ccDialog.show({
             title: '第一个弹窗',
-            icon: require('../../images/dialog/iconleave.png'),
+            icon: require('../../../images/dialog/iconleave.png'),
             btnOK: '确认',
             btnCancel: '取消'
         })
         ret = await ccDialog.show({
             title: '第2个弹窗',
-            icon: require('../../images/dialog/iconleave.png'),
+            icon: require('../../../images/dialog/iconleave.png'),
             btnOK: '确认',
             btnCancel: '取消'
         })
         await ccDialog.show({
             title: '第3个弹窗',
-            icon: require('../../images/dialog/iconleave.png'),
+            icon: require('../../../images/dialog/iconleave.png'),
             btnOK: '确认',
             btnCancel: '取消'
         })

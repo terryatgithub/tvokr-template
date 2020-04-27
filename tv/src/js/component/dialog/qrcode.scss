@@ -6,7 +6,7 @@
                 position: relative;
                 width: 711px;
                 height: 449px;
-                background: url('../images/dialog/bg.png') center no-repeat;
+                background: url('../../../images/dialog/bg.png') center no-repeat;
                 .wrapper {
                     position: relative;
                     &>span {
@@ -54,8 +54,8 @@
                 margin-top: 30px;
                 font-size: 32px;
                 color: #fff;
-                background: url('../images/dialog/btnfocus.png') no-repeat center,
-                url('../images/dialog/btn.png') no-repeat center;
+                background: url('../../../images/dialog/btnfocus.png') no-repeat center,
+                url('../../../images/dialog/btn.png') no-repeat center;
                 border: none;
             }     
         }

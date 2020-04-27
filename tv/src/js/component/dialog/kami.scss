@@ -1,13 +1,12 @@
 #deviceready {
     #dialog {
-        font-weight: bold;
-        .container.common {
+        .container.kami {
             text-align: center;
             .main {
                 position: relative;
                 width: 711px;
                 height: 449px;
-                background: url('../images/dialog/bg.png') center no-repeat;
+                background: url('../../../images/dialog/bg.png') center no-repeat;
                 .wrapper {
                     position: relative;
                     &>span {
@@ -17,10 +16,20 @@
                         font-size: 32px;
                         color: #c85504;
                     }
-                    .icon {
-                        width: 196px;
-                        height: 196px;
-                        margin: 23px auto 25px;
+                    .content {
+                        position: relative;
+                        margin: 32px auto 74px;
+                        width: 585px;
+                        height: 138px;
+                        background: url('../../../images/dialog/iconkami.png') center/100% no-repeat;
+                        .cardinfo {
+                            font-size: 25px;
+                            color: #c85504;
+                            height: 50%;
+                            line-height: 69px;
+                            text-align: left;
+                            padding-left: 1em;
+                        }    
                     }
                     .tip {
                         font-size: 20px;
@@ -37,12 +46,9 @@
                 margin-top: 30px;
                 font-size: 32px;
                 color: #fff;
-                background: url('../images/dialog/btn.png') no-repeat center;
+                background: url('../../../images/dialog/btnfocus.png') no-repeat center,
+                url('../../../images/dialog/btn.png') no-repeat center;
                 border: none;
-            }
-            .btn.btn-focus {
-                background: url('../images/dialog/btnfocus.png') no-repeat center,
-                url('../images/dialog/btn.png') no-repeat center;
             }     
         }
     }

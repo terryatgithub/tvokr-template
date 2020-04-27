@@ -1,5 +1,5 @@
-import ccView from './view.js'
-import '../../css/rules.scss'
+import ccView from './../view.js'
+import './rules.scss'
 
 class RulePage extends ccView {
     constructor(selector) {

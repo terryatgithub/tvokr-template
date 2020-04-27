@@ -1,6 +1,6 @@
 import ccmap from '@ccos/ccmap'
-import '../../css/dialog.scss'
-import ccEvent from '../eventhandler/index.js';
+import './dialog.scss'
+import ccEvent from '../../eventhandler/index.js';
 
 /**
  * 对话框类（模态弹窗） 

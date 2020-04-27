@@ -13,7 +13,7 @@ $bgHomeColor: #2d66cf;
 
         .header-zone {
             height: 280px;
-            background-image: url('../images/home/1bg.jpg');
+            background-image: url('../../../images/home/1bg.jpg');
             &>div,&>ul {
                 position: absolute;
             }
@@ -51,13 +51,13 @@ $bgHomeColor: #2d66cf;
                     }
                 }
                 div:first-child {
-                    background-image: url('../images/home/btn_award.png');
+                    background-image: url('../../../images/home/btn_award.png');
                 }
                 div:nth-child(2) {
-                    background-image: url('../images/home/btn_rule.png');
+                    background-image: url('../../../images/home/btn_rule.png');
                 }
                 div:last-child {
-                    background-image: url('../images/home/btn_seckill.png');
+                    background-image: url('../../../images/home/btn_seckill.png');
                 }
             }
        
@@ -65,17 +65,17 @@ $bgHomeColor: #2d66cf;
 
         .second-zone {
             height: 374px;
-            background-image: url('../images/home/2bg.jpg');
+            background-image: url('../../../images/home/2bg.jpg');
         }
 
         .third-zone {
             height: 582px;
-            background-image: url('../images/home/3bg.jpg');
+            background-image: url('../../../images/home/3bg.jpg');
         }
 
         .forth-zone {
             height: 567px;
-            background-image: url('../images/home/4bg.jpg');
+            background-image: url('../../../images/home/4bg.jpg');
 
         }
 

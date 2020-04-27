@@ -9,16 +9,16 @@ import _util from './util/index.js'
 import _data from './util/datacollect.js'
 import pcDebug from './debug/debug.js'
 
-import _dialog from './component/dialog.js' 
-import _qrcode from './component/qrcode.js'
-import _kami from './component/kami.js'
-import _entityCollected from './component/entitycollected.js'
-import _toast from './component/toast.js'
+import _dialog from './component/dialog/dialog.js' 
+import _qrcode from './component/dialog/qrcode.js'
+import _kami from './component/dialog/kami.js'
+import _entityCollected from './component/dialog/entitycollected.js'
+import _toast from './component/toast/toast.js'
 
-import homePage from './views/home.js'
-import awardPage from './views/award.js'
-import seckillPage from './views/seckill.js'
-import rulesPage from './views/rules.js'
+import homePage from './views/home/home.js'
+import awardPage from './views/award/award.js'
+import seckillPage from './views/seckill/seckill.js'
+import rulesPage from './views/rules/rules.js'
 
 //全局对象
 window.ccRouter = _router

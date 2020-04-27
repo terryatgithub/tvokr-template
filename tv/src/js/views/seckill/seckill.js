@@ -1,5 +1,5 @@
-import ccView from './view.js'
-import '../../css/seckill.scss'
+import ccView from './../view.js'
+import './seckill.scss'
 
 class SeckillPage extends ccView{
     

@@ -4,10 +4,10 @@
  *     view: 实际对应的页面对象
  */
 
-import homePage from '../views/home.js'
-import awardPage from '../views/award.js'
-import seckillPage from '../views/seckill.js'
-import rulePage from '../views/rules.js'
+import homePage from '../views/home/home.js'
+import awardPage from '../views/award/award.js'
+import seckillPage from '../views/seckill/seckill.js'
+import rulePage from '../views/rules/rules.js'
 
 const routes = [
     {
