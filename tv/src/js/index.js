@@ -24,7 +24,7 @@ function generateHtml() {
         dialogHtml,
         '</div>'
     ]
-    document.write(content.join())
+    document.write(content.join(''))
 }
 
 class App {
