@@ -1,44 +1,165 @@
+*{
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+}
 #deviceready {
     #dialog {
         font-weight: bold;
         .container.common {
             text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1280px;
+            height: 720px;
+            background-image: url('../../../images/dialog/bg.png');
             .main {
-                position: relative;
-                width: 711px;
-                height: 449px;
-                background: url('../../../images/dialog/bg.png') center no-repeat;
+                position: absolute;
+                top: 216px;
+                left: 370px;
+                width: 530px;
+                height: 245px;
                 .wrapper {
-                    position: relative;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: 100%;
                     &>span {
                         display: block;
                     }
-                    .title {
-                        font-size: 32px;
-                        color: #c85504;
+                    //提现二维码样式
+                    .kubiTitle,.dialogTitle{
+                        position: relative;
+                        top: 15px;
+                        height: 40px;
+                        text-align: center;
+                        line-height: 40px;
+                        font-size: 30px;
+                        color: #fffd3b;
                     }
-                    .icon {
-                        width: 196px;
-                        height: 196px;
-                        margin: 23px auto 25px;
-                    }
-                    .tip {
+                    #persuadeInfo{
+                        position: relative;
+                        top: 25px;
+                        height: 20px;
+                        text-align: center;
+                        line-height: 20px;
                         font-size: 20px;
-                        color: #d8692b;
+                        color: #fffdcc;
+                    }
+                    #qrcodeWarmImg{
+                        position: relative;
+                        top: 30px;
+                        height: 158px;
+                        width: 493px;
+                    }
+                    #persuadeImg,#miaoshaImg,#kubiImg{
+                        position: relative;
+                        top: 30px;
+                        height: 145px;
+                        width: 145px;
+                    }
+                    #badNetImg,#miaoshaImg{
+                        position: relative;
+                        top: 40px;
+                    }
+                    #vxQrcodeImg{
+                        position: relative;
+                        top: 30px;
+                    }
+                    #qrcodeWarmInfo{
+                        position: absolute;
+                        top: 73px;
+                        left: 25px;
+                        height: 150px;
+                        width: 480px;
+                        line-height: 75px;
+                        font-size: 33px;
+                        color: #fff;
+                        text-align: center;
+                    }
+                    #qrcodeBox,#kubiQrcodeBox{
+                        position: relative;
+                        top: 22px;
+                        height: 170px;
+                        width: 170px;
+                        background-color: #fff;
+                        border: 5px solid #fff;
+                    }
+                    #kubiQrcodeBox{
+                        position: absolute;
+                        top: 64px;
+                        left: 50px;
+                    }
+                    .redInfo3{
+                        color: #fff;
+                        top: 94px;
+                        position: absolute;
+                        left: 260px;
+                        font-size: 24px;
+                        line-height: 60px;
+                        text-align: left;
+                    }
+                    .redInfo2{
+                        color: #fff;
+                        top: 68px;
+                        position: absolute;
+                        left: 260px;
+                        font-size: 20px;
+                        line-height: 34px;
+                        text-align: left;
+                        height: 170px;
+                        overflow: hidden;
+                    }
+                    #_redNotGetNum{
+                        color:#fffd3b ;
+                        font-size: 30px;
+                    }
+                    #nullAwardTitle2{
+                        position: relative;
+                        top: 15px;
+                        height: 40px;
+                        text-align: center;
+                        line-height: 40px;
+                        font-size: 20px;
+                        color: #ffffff;
+                    }
+                    #nullAwardImg{
+                        position: relative;
+                        top: 15px;
+                    }
+                    .lowversion{
+                        position: absolute;
+                        top: 33px;
+                        left: 17px;
+                        height: 294px;
+                        width: 501px;
+                        color: #fffd3b;
+                        font-size: 30px;
                     }
                 }
-    
-            }   
+            }
+            .foot{
+                position: absolute;
+                top: 460px;
+                left: 370px;
+                height: 70px;
+                width: 530px;
+                font-size: 0;
+                margin: 0 auto;
+                text-align: center;
+            }
             .btn {
+                position: relative;
                 display: inline-block;
-                width: 220px;
-                height: 90px;
-                line-height: 90px;
-                margin-top: 30px;
-                font-size: 32px;
-                color: #fff;
+                width: 145px;
+                height: 67px;
+                line-height: 67px;
+                font-size: 19px;
+                color: #c63b20;
                 background: url('../../../images/dialog/btn.png') no-repeat center;
-                border: none;
             }
             .btn.btn-focus {
                 background: url('../../../images/dialog/btnfocus.png') no-repeat center,

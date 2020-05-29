@@ -24,7 +24,6 @@ switch(process.env.NODE_ENV) { //todo 地址确认正确的
         wxAppId = 'wxee96df3337b09cb5' //酷开玩家
         wxPublicAccountDefaultUrl = 'http://weixin.qq.com/q/023Aku83F7b-T100000072'
         mobFillUserInfoPageUrl = 'http://beta.webapp.skysrt.com/zy/2020418/mobile/index.html'
-        store.setActiviyId(226, 227)
         break;
     case 'development': 
         baseUrl = ''
@@ -36,7 +35,6 @@ switch(process.env.NODE_ENV) { //todo 地址确认正确的
         wxAppId = 'wxee96df3337b09cb5' //酷开玩家
         wxPublicAccountDefaultUrl = 'http://weixin.qq.com/q/023Aku83F7b-T100000072'
         mobFillUserInfoPageUrl = 'http://beta.webapp.skysrt.com/zy/2020418/mobile/index.html'
-        store.setActiviyId(226, 227) 
         break;
     case 'production': 
         baseUrl = ''
@@ -48,7 +46,6 @@ switch(process.env.NODE_ENV) { //todo 地址确认正确的
         wxAppId = 'wx5a6d3bdcd05fb501' //酷开爱看电视
         wxPublicAccountDefaultUrl = 'http://weixin.qq.com/q/02c8opsCULbkT10000007U'
         mobFillUserInfoPageUrl = 'https://webapp.skysrt.com/common-activity/418okr/mobile/index.html'
-        store.setActiviyId(218, 217) //正式活动id
         break;    
 }
 

@@ -27,13 +27,14 @@ class MyData {
      init() {
           this.timePageStart = common.getNowTimeSecond()
           console.log('data init, start time: ' + this.timePageStart)
-          this.activity_name = '418会员日电视端'
+          this.activity_name = '2020618看电视赚现金活动'
           this.activity_type = 'OKR活动'
           this.page_state = '加载成功'
           this.activity_stage = '活动期间'
      }
 
      setActState({page_state, activity_stage}) {
+          console.log("setActState..."+page_state+"=="+activity_stage)
           this.page_state = page_state
           this.activity_stage = activity_stage
      }
@@ -43,10 +44,15 @@ class MyData {
       * @param {*} param 
       */
      submitLogShow(param) {
-          console.log('submitLogShow...')
+          if (param.load_duration) {
+               param.load_duration = (param.load_duration - this.timePageStart)/1000
+          }
+          console.log(param.load_duration)
           let that = this,
               info = ccStore.getters.commonParam(),
               eventParams = Object.assign(param, {
+                    page_state : that.page_state,
+                    activity_stage : that.activity_stage,
                     activity_name: that.activity_name,
                     activity_type: that.activity_type,
                     activity_id: info.id,
@@ -67,6 +73,7 @@ class MyData {
           let that = this,
               info = ccStore.getters.commonParam(),
               eventParams = Object.assign(param, {
+                    activity_stage : that.activity_stage,
                     activity_name: that.activity_name,
                     activity_type: that.activity_type,
                     activity_id: info.id,

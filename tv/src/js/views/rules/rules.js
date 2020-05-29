@@ -16,8 +16,11 @@ class RulePage extends ccView {
     async created() {
         console.log('--rulesPage created')
         ccData.submitLogShow({
-            page_name: '活动规则页',
+            page_name: '活动规则',
+            page_type: 'inactivityWindows',
+            coocaabi_state:''
         })
+        console.log("this.id==="+this.id)
         $(this.id).show()
         this.bindKeys()
     }

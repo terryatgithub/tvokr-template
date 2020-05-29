@@ -789,7 +789,7 @@ class DrawLuck {
                case (ccStore.state.actStates === 'end'):
                     ccToast.show('提示<br>本次活动已结束，谢谢参与!');
                     break;
-               case (!ccStore.state.hasLogin):
+               case (!ccStore.state.loginstatus):
                     ccMw.tv.goLogin()
                     break;
                case (!ccStore.state.luckDrawInfo.isVip):

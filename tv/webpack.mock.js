@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 module.exports = merge(common, {
     mode: 'development',
-    devtool: 'inline-source-map',
+    devtool: 'cheap-eval-source-map',
     devServer: { //webpack-dev-server设置
         contentBase: './src',
         port: 8082,

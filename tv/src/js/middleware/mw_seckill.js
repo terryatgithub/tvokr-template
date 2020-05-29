@@ -254,7 +254,7 @@ class SeckillMiddleware {
             }) 
             return
         }
-        if(!ccStore.state.hasLogin) {
+        if(!ccStore.state.loginstatus) {
             ccMw.tv.goLogin()
             return 
         }

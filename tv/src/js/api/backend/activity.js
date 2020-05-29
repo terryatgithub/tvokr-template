@@ -2,7 +2,6 @@
  * 活动后台接口
  */
 import urls from './url.js'
-import md5 from 'md5'
 
 const _urls = {
     init: urls.actUrl + 'building/v2/web/init', //活动初始化接口
@@ -32,7 +31,7 @@ class ActivityBackendApi {
         console.log('act divid init')
         let data = ccStore.getters.commonParam(),
             token = `i=${data.cUDID}&cu=${data.cOpenId}&mac=${data.cModel}&cm=${data.cChip}&cc=${data.id}&uu=${data.MAC}&gnTzIdesKHE2QBYw`;
-        data.token = md5(token)
+        data.token = ccUtil.sha256(token)
         let res = await ccUtil.post({
             url: _urls.init,
             data
@@ -91,7 +90,7 @@ class ActivityBackendApi {
                 originType: 'task'
             },
             token = `i=${data.cUDID}&cu=${data.cOpenId}&mac=${data.cModel}&cm=${data.cChip}&cc=${data.id}&uu=${data.MAC}&gnTzIdesKHE2QBYw`;
-        data.token = md5(token)
+        data.token = ccUtil.sha256(token)
 
         let res = await ccUtil.post({
             url: _urls.init,
@@ -112,7 +111,7 @@ class ActivityBackendApi {
                 originType: type ? '' : 'task'
             },
         token = `i=${data.cUDID}&cu=${data.cOpenId}&mac=${data.cModel}&cm=${data.cChip}&cc=${data.id}&uu=${data.MAC}&k=${data.userKeyId}&2mstq8PkTGnuq6fv`;
-        data.token = md5(token)
+        data.token = ccUtil.sha256(token)
         let res = await ccUtil.post({
             url: _urls.draw,
             data
@@ -132,7 +131,7 @@ class ActivityBackendApi {
                 ...awardInfo
             },
             token = `aw=${data.rememberId}&re=${data.userKeyId}&u=${data.awardTypeId}&t=${data.activeId}&p=${data.cOpenId}&0y8LiSu7DNcIUqlW`;
-        data.token = md5(token)
+        data.token = ccUtil.sha256(token)
         let res = await ccUtil.get({
             url: _urls.receiveMyReward,
             data

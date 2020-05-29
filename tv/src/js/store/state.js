@@ -8,29 +8,39 @@ const state = {
         divid: 218,
         draw: 217
     }, 
-    actStates: 'ongoing', //活动状态：进行中 或 已结束 'end'
-    source: 'yinhe', //视频源
+    ccfrom: '', //运营配置页面入口字段
+    actionId:"0", 
+    miaoshaId:"0",//秒杀活动id
+    actStates:"end",//活动进行中
+    tvsource: 'yinhe', //视频源
     deviceInfo: {}, //设备信息
     userInfo: {},   //用户信息
-    userToken: '',  //
-    hasLogin: false,    //用户是否已登录
-    goVipBuyPage: false,   //去产品包购买页
-    goLoginPage: false, //去登录页
+    loginstatus : false,
+    goLoginPage: false,
+    access_token: '',  //
+    vuserid : '',
     homepageVersion: 0, //主页版本号
+    browserVersion: 0,//浏览器版本
+    activityCenterVersion:0,//活动中心版本
+    mallVersion: 0,//商城版本
     userKeyId: '',  //后台返回的标识用户唯一身份的字段
-    ccfrom: 'movie',//进入活动的来源, 默认影视，可在url后配置：ccfrom=edu/kid/game
-    luckDrawInfo: { //抽奖后台返回的用戶VIP信息
-        isVip: false,
-        vipType: 0,
-        overNum: 0,
-        vipSourceId: {
-            'movieiyiqi': 1, //影视奇异
-            'movietencent': 5, //影视腾讯
-            'edu': 58, //教育
-            'kid': 57, //少儿
-            'game': 56 //电竞
-        }
+    startDayNum :'0',//活动当前第几天
+    GetvxPluginT:"",
+    timerId : 0,
+    autoClickAfterLogin : false,
+    vipSourceId: {
+        'movieiyiqi': 1, //影视奇异
+        'movietencent': 5, //影视腾讯
+        'edu': 58, //教育
+        'kid': 57, //少儿
+        'game': 56 //电竞
     },
+    gamesGoodsArr : [13906,10136,14170,14169,14163,11180,10104,14155],  ////正式：[22887,22889,22892,22784,23625,23624,23452,23451,23565];
+    hasDownTask : false,//是否有进行中的下载任务
+    downIndex : -1,
+    spikeSign : 0,//秒杀的sign
+    loginTaskId: 0,//登录任务id
+    remainLoginTaskNum : 0//剩余的登录任务完成次数
 }
 
 export default state

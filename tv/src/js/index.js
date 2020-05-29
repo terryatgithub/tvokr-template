@@ -54,7 +54,9 @@ class App {
             // }
         });
         ccApp.ccReady({
-            onReceive: ccMain.onCcReady.bind(ccMain),
+            onReceive: function() {
+                ccMain.onCcReady()
+            },
             success: function() {
                 console.log('ccReady success')
             }
@@ -63,7 +65,7 @@ class App {
             eventName: 'resume',
             onReceive: function () {
                 console.log('resume')
-                ccMain.onResumeEvent().bind(ccMain)
+                ccMain.onResumeEvent()
             }
         });
         ccApp.bindEvent({
@@ -83,7 +85,7 @@ class App {
             eventName: 'backbuttondown',
             onReceive: function () {
                 console.log('backbuttondown ...........')
-                ccMain.backKeyHandler().bind(ccMain)
+                ccMain.backKeyHandler()
             },
             success: function() {
                 console.log('backbuttondown bind success')
@@ -93,7 +95,7 @@ class App {
             eventName: 'homebutton',
             onReceive: function () {
                 console.log('homebutton')
-                ccMain.homeKeyHandler().bind(ccMain)
+                ccMain.homeKeyHandler()
                 ccApp.exitPage();
             }
         });

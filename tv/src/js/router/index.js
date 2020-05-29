@@ -29,6 +29,13 @@ class ccRouter {
     }
 
     /**
+     * 复位页面url到初始进入状态，删除后跟的hash参数
+     */
+    reset() {
+        window.location.href = window.location.href.split('#')[0]
+    }
+
+    /**
      * 路由回调函数
      * @param {Event} e 路由Event对象
      */
@@ -38,7 +45,7 @@ class ccRouter {
             path = this._parseHash(),
             to = this.routes[this._getRouteIndex(path.h)];
         from.view.uninit()  //todo 是否需要改爲async/await
-        to.view.init(path.param)    
+        to.view.init({hash: path.param})    
         this._from = to.name    
     }
     

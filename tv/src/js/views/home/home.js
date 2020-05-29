@@ -23,6 +23,10 @@ class HomePage extends ccView{
         console.log('home created')
         $(this.id).show()
         this.bindKeys()
+        if(ccStore.state.autoClickAfterLogin) {
+            ccStore.state.autoClickAfterLogin = false
+            this._autoTriggerClick()    
+        }
     }
     
     /**
@@ -43,6 +47,14 @@ class HomePage extends ccView{
 		$(this.id).hide()
     }
 
+    async _needLoginFirst() {
+        if(!ccStore.state.loginstatus) {
+            ccStore.state.autoClickAfterLogin = true
+            ccMw.tv.goLogin()
+            return true
+        }
+    }
+
     /**
      * 点击事件回调函数
      * @param {Event} e 
@@ -53,8 +65,16 @@ class HomePage extends ccView{
             ret;
         console.log(`home onClick event target: ${id}`)
         switch(id){
+            case 'needLoginFirst':
+                alert('check login status')
+                if(ctx._needLoginFirst()) {
+                    alert('已登录')
+                    return
+                }
+                alert('未登录')
+                break;
             case 'goAwardPage': //去‘我的奖品’
-                if(!ccStore.state.hasLogin) {
+                if(!ccStore.state.loginstatus) {
                     ccMw.tv.goLogin()
                     return 
                 }
@@ -74,7 +94,7 @@ class HomePage extends ccView{
                 })
                 break;     
             case 'goSeckillPage': //去‘我的秒杀’
-                if(!ccStore.state.hasLogin) {
+                if(!ccStore.state.loginstatus) {
                     ccMw.tv.goLogin()
                     return 
                 }
@@ -126,12 +146,15 @@ class HomePage extends ccView{
      * demo 显示一个弹窗
      */
     async _showOneDialog() {
+        let _alertCoinHtml = `
+            <div class="dialogTitle">恭喜获得11酷币</div>
+            <img id="kubiImg" src='${require('../../../images/dialog/iconok.png')}' />
+        `;
         let ret = await ccDialog.show({
-            title: '一个弹窗',
-            icon: require('../../../images/dialog/iconleave.png'),
-            btnOK: '确认',
-            btnCancel: '取消',
-        })
+            innerHtml:_alertCoinHtml,
+            btnOK: '继续参与',
+            type: 'kubi'
+        }) 
         if(ret.confirm) {
             alert('ok')
         } else {
@@ -144,24 +167,33 @@ class HomePage extends ccView{
      * demo 显示多个弹窗
      */
     async _showMultiDialog() {
+        let _alertCoinHtml = `
+            <div class="dialogTitle">第1个弹窗</div>
+            <img id="kubiImg" src='${require('../../../images/dialog/iconok.png')}' />
+        `;
         let ret = await ccDialog.show({
-            title: '第一个弹窗',
-            icon: require('../../../images/dialog/iconleave.png'),
-            btnOK: '确认',
-            btnCancel: '取消'
-        })
+            innerHtml:_alertCoinHtml,
+            btnOK: '继续参与',
+            type: 'kubi'
+        }) 
+        _alertCoinHtml = `
+            <div class="dialogTitle">第2个弹窗</div>
+            <img id="kubiImg" src='${require('../../../images/dialog/iconok.png')}' />
+        `;
         ret = await ccDialog.show({
-            title: '第2个弹窗',
-            icon: require('../../../images/dialog/iconleave.png'),
-            btnOK: '确认',
-            btnCancel: '取消'
-        })
-        await ccDialog.show({
-            title: '第3个弹窗',
-            icon: require('../../../images/dialog/iconleave.png'),
-            btnOK: '确认',
-            btnCancel: '取消'
-        })
+            innerHtml:_alertCoinHtml,
+            btnOK: '继续参与',
+            type: 'kubi'
+        }) 
+        _alertCoinHtml = `
+            <div class="dialogTitle">第3个弹窗</div>
+            <img id="kubiImg" src='${require('../../../images/dialog/iconok.png')}' />
+        `;
+        ret = await ccDialog.show({
+            innerHtml:_alertCoinHtml,
+            btnOK: '继续参与',
+            type: 'kubi'
+        }) 
         if(ret.confirm) {
             alert('ok')
         } else {
@@ -175,12 +207,15 @@ class HomePage extends ccView{
      */
     async _showQrDialog() {
         let qrUrl =await ccUtil.showQrCode({ url: 'http://www.coocaa.com', urlOnly: true })
-        let ret = await ccQrCode.show({
-            title: '恭喜获得5元巨款',
-            icon: qrUrl,
-            tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
-            btnOK: '知道了'
-        })
+        let _alertCoinHtml = `
+            <div class="dialogTitle">发财了</div>
+            <img id="kubiImg" src='${qrUrl}' />
+        `;
+        let ret = await ccDialog.show({
+            innerHtml:_alertCoinHtml,
+            btnOK: '继续参与',
+            type: 'qrcode'
+        }) 
         this.bindKeys()    
     }
 
@@ -188,15 +223,16 @@ class HomePage extends ccView{
      * demo 显示实体二维码弹窗
      */
     async _showEntityDialog() {
-        let detail = `收货人: 張三<br>手机: 13555555555<br>收货地址: 北京市前門佛阿吉爾菲娜拉爾囧附件二及分類`;
-        let ret = await ccEntityCollected.show({
-            title: '恭喜获得实物奖',
-            icon: 'http://res.lottery.coocaatv.com//uploads/img/20200403/20200403150636832115.png',
-            tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
-            detail,
-            btnOK: '已领取'
-        }) 
-        this.bindKeys()
+        ccToast.show('@.@<br>请参照其它对话框实现~详情咨询心旺')  
+        // let detail = `收货人: 張三<br>手机: 13555555555<br>收货地址: 北京市前門佛阿吉爾菲娜拉爾囧附件二及分類`;
+        // let ret = await ccEntityCollected.show({
+        //     title: '恭喜获得实物奖',
+        //     icon: 'http://res.lottery.coocaatv.com//uploads/img/20200403/20200403150636832115.png',
+        //     tip: '*奖品已放入【我的奖品】，按【返回】键关闭弹窗提示!',
+        //     detail,
+        //     btnOK: '已领取'
+        // }) 
+        // this.bindKeys()
     }
 
     /**

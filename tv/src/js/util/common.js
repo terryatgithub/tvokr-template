@@ -2,6 +2,8 @@
  * 通用工具类
  */
 import QRCode from 'qrcode'
+import md5 from 'md5'
+import {sha256} from 'js-sha256'
 
 class Common {
 
@@ -71,7 +73,7 @@ class Common {
 	 * 	data: Object 
 	 */
 	get({url, data}) {
-		console.log('get ' + JSON.stringify(data))
+		//console.log('get ' + JSON.stringify(data))
 		return new Promise((resolve, reject) => {
 			let a = $.ajax({
 						url,
@@ -116,13 +118,27 @@ class Common {
 			})
 		})
 	}
+	/**
+	 * 需要md5 hash的字符串
+	 * @param {String} str 
+	 */
+	md5(str) {
+		return md5(str) 
+	}
 
+	/**
+	 * sha256 hash的字符串
+	 * @param {String} str 
+	 */
+	sha256(str) {
+		return sha256(str) 
+	}
 	/**
 	 * 获取当前时间(秒)
 	 * @returns {String} 比如 "1587114827"
 	 */
 	getNowTimeSecond() {
-		return +Date.now().toFixed(0).slice(0,10)
+		return +Date.now().toFixed(0)
 	}
 
 	/**
@@ -130,9 +146,8 @@ class Common {
 	 * @param {Number} time: 结束时间，格式为 Date.now() 返回值
 	 * @returns {String} 比如: 01:20:35
 	 */
-	getcountdown(time) {
-		let now = Date.now(),
-			hour=0, 
+	getcountdown(time,now=Date.now()) {
+		let hour=0, 
 			minute=0, 
 			second=0, 
 			total,

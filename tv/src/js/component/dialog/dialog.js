@@ -31,6 +31,7 @@ class Dialog {
 		return new Promise(resolve => {
 			that._show({
 				...param,
+				type: param.type ? param.type : 'default',
 				success() {
 					resolve({confirm: true})
 				},
@@ -65,24 +66,25 @@ class Dialog {
 	isShow() { //todo 这里要重点说明或后续优化当前这种模式
 		let dlg = null
 		if($('#dialog').css('display') === 'none') return dlg;
-		//每个弹窗实例对应的className
-		let dialoglist = {
-			'common': ccDialog,
-			'qrcode': ccQrCode,
-			'entity-collected': ccEntityCollected,
-			'kami': ccKami,
-		}
-		$('#dialog').children().each(function(){
-			if($(this).css('display') != 'none') {
-				for(let key in dialoglist) {
-					if($(this).hasClass(key)) {
-						dlg = dialoglist[key]
-						return false
-					}
-				}
-			}
-		})
-		return dlg
+		return ccDialog
+		// //每个弹窗实例对应的className
+		// let dialoglist = {
+		// 	'common': ccDialog,
+		// 	'qrcode': ccQrCode,
+		// 	'entity-collected': ccEntityCollected,
+		// 	'kami': ccKami,
+		// }
+		// $('#dialog').children().each(function(){
+		// 	if($(this).css('display') != 'none') {
+		// 		for(let key in dialoglist) {
+		// 			if($(this).hasClass(key)) {
+		// 				dlg = dialoglist[key]
+		// 				return false
+		// 			}
+		// 		}
+		// 	}
+		// })
+		// return dlg
 	}
 
 	/**
@@ -123,13 +125,10 @@ class Dialog {
 	 */
 	_render() {
 		let param = this._param
-		let dlg = $(this.id).children()
-		dlg.find('.title').html(param.title || '提示')
-		dlg.find('.icon').attr('src', param.icon)
-		dlg.find('.tip').html(param.tip || '')
-		dlg.filter('.dialog-confirm').text(param.btnOK || '确认')
+		$(this.id).find(".main").find(".wrapper").html(param.innerHtml)
+		$(this.id).find(".foot").children().filter('.dialog-confirm').text(param.btnOK || '确认')
 		//判断是否需要显示‘取消’按钮
-		param.btnCancel && dlg.filter('.dialog-cancel').text(param.btnCancel || '取消').show().addClass('coocaa_btn')
+		param.btnCancel && $(this.id).find(".foot").children().filter('.dialog-cancel').text(param.btnCancel || '取消').show().addClass('coocaa_btn')
 	}
 	
 }
